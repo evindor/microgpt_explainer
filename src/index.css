@@ -1,46 +1,450 @@
 @import "tailwindcss";
 
 @theme {
-  --color-slate-950: #020617;
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-600: #475569;
-  --color-slate-500: #64748b;
-  --color-slate-400: #94a3b8;
-  --color-slate-300: #cbd5e1;
-  --color-slate-200: #e2e8f0;
-  --color-slate-100: #f1f5f9;
-  --color-cyan-400: #22d3ee;
-  --color-cyan-500: #06b6d4;
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
-  --color-emerald-400: #34d399;
-  --color-emerald-500: #10b981;
-  --color-violet-400: #a78bfa;
-  --color-violet-500: #8b5cf6;
-  --color-rose-400: #fb7185;
-  --color-rose-500: #f43f5e;
-  --color-blue-400: #60a5fa;
-  --color-blue-500: #3b82f6;
-  --color-pink-400: #f472b6;
-  --color-pink-500: #ec4899;
-  --color-orange-400: #fb923c;
-  --color-orange-500: #f97316;
-  --color-indigo-400: #818cf8;
-  --color-indigo-500: #6366f1;
+  --color-slate-950: var(--shell-bg-deep);
+  --color-slate-900: var(--shell-bg);
+  --color-slate-800: var(--shell-surface);
+  --color-slate-700: var(--shell-border);
+  --color-slate-600: var(--shell-text-dim);
+  --color-slate-500: var(--shell-text-muted);
+  --color-slate-400: var(--shell-text-secondary);
+  --color-slate-300: var(--shell-text);
+  --color-slate-200: var(--shell-text-bright);
+  --color-slate-100: var(--shell-text-heading);
+  --color-cyan-400: var(--accent-cyan);
+  --color-cyan-500: var(--accent-cyan-strong);
+  --color-amber-400: var(--accent-amber);
+  --color-amber-500: var(--accent-amber-strong);
+  --color-emerald-400: var(--accent-emerald);
+  --color-emerald-500: var(--accent-emerald-strong);
+  --color-violet-400: var(--accent-violet);
+  --color-violet-500: var(--accent-violet-strong);
+  --color-rose-400: var(--accent-rose);
+  --color-rose-500: var(--accent-rose-strong);
+  --color-blue-400: var(--accent-blue);
+  --color-blue-500: var(--accent-blue-strong);
+  --color-pink-400: var(--accent-pink);
+  --color-pink-500: var(--accent-pink-strong);
+  --color-orange-400: var(--accent-orange);
+  --color-orange-500: var(--accent-orange-strong);
+  --color-indigo-400: var(--accent-indigo);
+  --color-indigo-500: var(--accent-indigo-strong);
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DEFAULT THEME: Midnight  (also serves as :root fallback)
+   ═══════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="midnight"] {
+  /* Shell / chrome */
+  --shell-bg-deep: #020617;
+  --shell-bg: #0f172a;
+  --shell-surface: #1e293b;
+  --shell-border: #334155;
+  --shell-text-dim: #475569;
+  --shell-text-muted: #64748b;
+  --shell-text-secondary: #94a3b8;
+  --shell-text: #cbd5e1;
+  --shell-text-bright: #e2e8f0;
+  --shell-text-heading: #f1f5f9;
+
+  /* Accent palette */
+  --accent-cyan: #22d3ee;
+  --accent-cyan-strong: #06b6d4;
+  --accent-amber: #fbbf24;
+  --accent-amber-strong: #f59e0b;
+  --accent-emerald: #34d399;
+  --accent-emerald-strong: #10b981;
+  --accent-violet: #a78bfa;
+  --accent-violet-strong: #8b5cf6;
+  --accent-rose: #fb7185;
+  --accent-rose-strong: #f43f5e;
+  --accent-blue: #60a5fa;
+  --accent-blue-strong: #3b82f6;
+  --accent-pink: #f472b6;
+  --accent-pink-strong: #ec4899;
+  --accent-orange: #fb923c;
+  --accent-orange-strong: #f97316;
+  --accent-indigo: #818cf8;
+  --accent-indigo-strong: #6366f1;
+
+  /* Semantic tokens */
+  --viz-card-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  --viz-card-border: rgba(148, 163, 184, 0.1);
+  --glow-cyan: rgba(6, 182, 212, 0.15);
+  --glow-amber: rgba(245, 158, 11, 0.15);
+  --glow-violet: rgba(139, 92, 246, 0.15);
+  --glow-emerald: rgba(16, 185, 129, 0.15);
+  --glow-rose: rgba(244, 63, 94, 0.15);
+  --highlight-line-bg: rgba(251, 191, 36, 0.10);
+  --highlight-line-border: #fbbf24;
+
+  /* Code panel */
+  --code-bg: #0f172a;
+
+  /* SVG fallback colors */
+  --svg-muted: #94a3b8;
+  --svg-grid: #334155;
+  --svg-grid-light: #1e293b;
+  --svg-label: #64748b;
+
+  /* Node/graph colors (Autograd) */
+  --node-bg: #1e293b;
+  --node-bg-deep: #0f172a;
+  --node-stroke: #475569;
+  --node-glow-forward: #22d3ee;
+  --node-glow-forward-bg: #164e63;
+  --node-glow-backward: #fb7185;
+  --node-glow-backward-bg: #4c1d2e;
+  --node-value: #67e8f9;
+  --node-grad: #fb923c;
+  --node-grad-bg: #7c2d12;
+  --node-label: #cbd5e1;
+  --node-label-forward: #a5f3fc;
+  --node-label-backward: #fda4af;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MONOKAI
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="monokai"] {
+  --shell-bg-deep: #1a1a17;
+  --shell-bg: #272822;
+  --shell-surface: #3e3d32;
+  --shell-border: #49483e;
+  --shell-text-dim: #75715e;
+  --shell-text-muted: #90908a;
+  --shell-text-secondary: #a6a69e;
+  --shell-text: #d6d6c8;
+  --shell-text-bright: #f0efe6;
+  --shell-text-heading: #f8f8f2;
+
+  --accent-cyan: #66d9ef;
+  --accent-cyan-strong: #4ec5db;
+  --accent-amber: #e6db74;
+  --accent-amber-strong: #d4c85a;
+  --accent-emerald: #a6e22e;
+  --accent-emerald-strong: #8cc41a;
+  --accent-violet: #ae81ff;
+  --accent-violet-strong: #9b6bff;
+  --accent-rose: #f92672;
+  --accent-rose-strong: #e0165e;
+  --accent-blue: #66d9ef;
+  --accent-blue-strong: #4ec5db;
+  --accent-pink: #f92672;
+  --accent-pink-strong: #e0165e;
+  --accent-orange: #fd971f;
+  --accent-orange-strong: #e88810;
+  --accent-indigo: #ae81ff;
+  --accent-indigo-strong: #9b6bff;
+
+  --viz-card-bg: linear-gradient(135deg, rgba(62, 61, 50, 0.8), rgba(39, 40, 34, 0.9));
+  --viz-card-border: rgba(73, 72, 62, 0.3);
+  --glow-cyan: rgba(102, 217, 239, 0.12);
+  --glow-amber: rgba(230, 219, 116, 0.12);
+  --glow-violet: rgba(174, 129, 255, 0.12);
+  --glow-emerald: rgba(166, 226, 46, 0.12);
+  --glow-rose: rgba(249, 38, 114, 0.12);
+  --highlight-line-bg: rgba(230, 219, 116, 0.08);
+  --highlight-line-border: #e6db74;
+
+  --code-bg: #272822;
+  --svg-muted: #a6a69e;
+  --svg-grid: #49483e;
+  --svg-grid-light: #3e3d32;
+  --svg-label: #75715e;
+
+  --node-bg: #3e3d32;
+  --node-bg-deep: #272822;
+  --node-stroke: #75715e;
+  --node-glow-forward: #66d9ef;
+  --node-glow-forward-bg: #2a4a52;
+  --node-glow-backward: #f92672;
+  --node-glow-backward-bg: #4c1d2e;
+  --node-value: #a6e22e;
+  --node-grad: #fd971f;
+  --node-grad-bg: #5a3510;
+  --node-label: #d6d6c8;
+  --node-label-forward: #a6e22e;
+  --node-label-backward: #f92672;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRACULA
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="dracula"] {
+  --shell-bg-deep: #1e1f29;
+  --shell-bg: #282a36;
+  --shell-surface: #383a59;
+  --shell-border: #44475a;
+  --shell-text-dim: #6272a4;
+  --shell-text-muted: #7e8ab8;
+  --shell-text-secondary: #a4b0d4;
+  --shell-text: #d4d8e8;
+  --shell-text-bright: #e8eaf0;
+  --shell-text-heading: #f8f8f2;
+
+  --accent-cyan: #8be9fd;
+  --accent-cyan-strong: #65d8f0;
+  --accent-amber: #f1fa8c;
+  --accent-amber-strong: #e0e86e;
+  --accent-emerald: #50fa7b;
+  --accent-emerald-strong: #2ee85e;
+  --accent-violet: #bd93f9;
+  --accent-violet-strong: #a678f0;
+  --accent-rose: #ff79c6;
+  --accent-rose-strong: #f05eb0;
+  --accent-blue: #8be9fd;
+  --accent-blue-strong: #65d8f0;
+  --accent-pink: #ff79c6;
+  --accent-pink-strong: #f05eb0;
+  --accent-orange: #ffb86c;
+  --accent-orange-strong: #f0a050;
+  --accent-indigo: #bd93f9;
+  --accent-indigo-strong: #a678f0;
+
+  --viz-card-bg: linear-gradient(135deg, rgba(56, 58, 89, 0.8), rgba(40, 42, 54, 0.9));
+  --viz-card-border: rgba(68, 71, 90, 0.3);
+  --glow-cyan: rgba(139, 233, 253, 0.12);
+  --glow-amber: rgba(241, 250, 140, 0.12);
+  --glow-violet: rgba(189, 147, 249, 0.12);
+  --glow-emerald: rgba(80, 250, 123, 0.12);
+  --glow-rose: rgba(255, 121, 198, 0.12);
+  --highlight-line-bg: rgba(241, 250, 140, 0.08);
+  --highlight-line-border: #f1fa8c;
+
+  --code-bg: #282a36;
+  --svg-muted: #a4b0d4;
+  --svg-grid: #44475a;
+  --svg-grid-light: #383a59;
+  --svg-label: #6272a4;
+
+  --node-bg: #383a59;
+  --node-bg-deep: #282a36;
+  --node-stroke: #6272a4;
+  --node-glow-forward: #8be9fd;
+  --node-glow-forward-bg: #2a4a55;
+  --node-glow-backward: #ff79c6;
+  --node-glow-backward-bg: #4c2244;
+  --node-value: #50fa7b;
+  --node-grad: #ffb86c;
+  --node-grad-bg: #5a4020;
+  --node-label: #d4d8e8;
+  --node-label-forward: #8be9fd;
+  --node-label-backward: #ff79c6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SOLARIZED DARK
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="solarized-dark"] {
+  --shell-bg-deep: #001e26;
+  --shell-bg: #002b36;
+  --shell-surface: #073642;
+  --shell-border: #094959;
+  --shell-text-dim: #586e75;
+  --shell-text-muted: #657b83;
+  --shell-text-secondary: #839496;
+  --shell-text: #93a1a1;
+  --shell-text-bright: #eee8d5;
+  --shell-text-heading: #fdf6e3;
+
+  --accent-cyan: #2aa198;
+  --accent-cyan-strong: #1a8f87;
+  --accent-amber: #b58900;
+  --accent-amber-strong: #9a7500;
+  --accent-emerald: #859900;
+  --accent-emerald-strong: #708300;
+  --accent-violet: #6c71c4;
+  --accent-violet-strong: #5860b0;
+  --accent-rose: #dc322f;
+  --accent-rose-strong: #c42825;
+  --accent-blue: #268bd2;
+  --accent-blue-strong: #1a78bb;
+  --accent-pink: #d33682;
+  --accent-pink-strong: #bc2870;
+  --accent-orange: #cb4b16;
+  --accent-orange-strong: #b33f10;
+  --accent-indigo: #6c71c4;
+  --accent-indigo-strong: #5860b0;
+
+  --viz-card-bg: linear-gradient(135deg, rgba(7, 54, 66, 0.8), rgba(0, 43, 54, 0.9));
+  --viz-card-border: rgba(88, 110, 117, 0.2);
+  --glow-cyan: rgba(42, 161, 152, 0.15);
+  --glow-amber: rgba(181, 137, 0, 0.15);
+  --glow-violet: rgba(108, 113, 196, 0.15);
+  --glow-emerald: rgba(133, 153, 0, 0.15);
+  --glow-rose: rgba(220, 50, 47, 0.15);
+  --highlight-line-bg: rgba(181, 137, 0, 0.10);
+  --highlight-line-border: #b58900;
+
+  --code-bg: #002b36;
+  --svg-muted: #839496;
+  --svg-grid: #094959;
+  --svg-grid-light: #073642;
+  --svg-label: #586e75;
+
+  --node-bg: #073642;
+  --node-bg-deep: #002b36;
+  --node-stroke: #586e75;
+  --node-glow-forward: #2aa198;
+  --node-glow-forward-bg: #0a3836;
+  --node-glow-backward: #dc322f;
+  --node-glow-backward-bg: #3a1515;
+  --node-value: #859900;
+  --node-grad: #cb4b16;
+  --node-grad-bg: #3a2010;
+  --node-label: #93a1a1;
+  --node-label-forward: #2aa198;
+  --node-label-backward: #dc322f;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SOLARIZED LIGHT
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="solarized-light"] {
+  /* INVERTED shell scale for light theme */
+  --shell-bg-deep: #fdf6e3;
+  --shell-bg: #fdf6e3;
+  --shell-surface: #eee8d5;
+  --shell-border: #d6cdb7;
+  --shell-text-dim: #93a1a1;
+  --shell-text-muted: #839496;
+  --shell-text-secondary: #657b83;
+  --shell-text: #586e75;
+  --shell-text-bright: #073642;
+  --shell-text-heading: #002b36;
+
+  --accent-cyan: #2aa198;
+  --accent-cyan-strong: #1a8f87;
+  --accent-amber: #b58900;
+  --accent-amber-strong: #9a7500;
+  --accent-emerald: #859900;
+  --accent-emerald-strong: #708300;
+  --accent-violet: #6c71c4;
+  --accent-violet-strong: #5860b0;
+  --accent-rose: #dc322f;
+  --accent-rose-strong: #c42825;
+  --accent-blue: #268bd2;
+  --accent-blue-strong: #1a78bb;
+  --accent-pink: #d33682;
+  --accent-pink-strong: #bc2870;
+  --accent-orange: #cb4b16;
+  --accent-orange-strong: #b33f10;
+  --accent-indigo: #6c71c4;
+  --accent-indigo-strong: #5860b0;
+
+  --viz-card-bg: linear-gradient(135deg, rgba(238, 232, 213, 0.8), rgba(253, 246, 227, 0.9));
+  --viz-card-border: rgba(147, 161, 161, 0.2);
+  --glow-cyan: rgba(42, 161, 152, 0.10);
+  --glow-amber: rgba(181, 137, 0, 0.10);
+  --glow-violet: rgba(108, 113, 196, 0.10);
+  --glow-emerald: rgba(133, 153, 0, 0.10);
+  --glow-rose: rgba(220, 50, 47, 0.10);
+  --highlight-line-bg: rgba(181, 137, 0, 0.10);
+  --highlight-line-border: #b58900;
+
+  --code-bg: #fdf6e3;
+  --svg-muted: #657b83;
+  --svg-grid: #d6cdb7;
+  --svg-grid-light: #eee8d5;
+  --svg-label: #93a1a1;
+
+  --node-bg: #eee8d5;
+  --node-bg-deep: #fdf6e3;
+  --node-stroke: #93a1a1;
+  --node-glow-forward: #2aa198;
+  --node-glow-forward-bg: #d4edeb;
+  --node-glow-backward: #dc322f;
+  --node-glow-backward-bg: #f5d4d3;
+  --node-value: #859900;
+  --node-grad: #cb4b16;
+  --node-grad-bg: #f5dece;
+  --node-label: #586e75;
+  --node-label-forward: #1a8f87;
+  --node-label-backward: #c42825;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GITHUB LIGHT
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="github-light"] {
+  --shell-bg-deep: #f6f8fa;
+  --shell-bg: #ffffff;
+  --shell-surface: #f0f1f3;
+  --shell-border: #d1d5db;
+  --shell-text-dim: #9ca3af;
+  --shell-text-muted: #6b7280;
+  --shell-text-secondary: #4b5563;
+  --shell-text: #374151;
+  --shell-text-bright: #1f2937;
+  --shell-text-heading: #111827;
+
+  --accent-cyan: #0891b2;
+  --accent-cyan-strong: #0e7490;
+  --accent-amber: #d97706;
+  --accent-amber-strong: #b45309;
+  --accent-emerald: #059669;
+  --accent-emerald-strong: #047857;
+  --accent-violet: #7c3aed;
+  --accent-violet-strong: #6d28d9;
+  --accent-rose: #e11d48;
+  --accent-rose-strong: #be123c;
+  --accent-blue: #2563eb;
+  --accent-blue-strong: #1d4ed8;
+  --accent-pink: #db2777;
+  --accent-pink-strong: #be185d;
+  --accent-orange: #ea580c;
+  --accent-orange-strong: #c2410c;
+  --accent-indigo: #4f46e5;
+  --accent-indigo-strong: #4338ca;
+
+  --viz-card-bg: linear-gradient(135deg, rgba(240, 241, 243, 0.8), rgba(255, 255, 255, 0.9));
+  --viz-card-border: rgba(209, 213, 219, 0.4);
+  --glow-cyan: rgba(8, 145, 178, 0.08);
+  --glow-amber: rgba(217, 119, 6, 0.08);
+  --glow-violet: rgba(124, 58, 237, 0.08);
+  --glow-emerald: rgba(5, 150, 105, 0.08);
+  --glow-rose: rgba(225, 29, 72, 0.08);
+  --highlight-line-bg: rgba(217, 119, 6, 0.08);
+  --highlight-line-border: #d97706;
+
+  --code-bg: #ffffff;
+  --svg-muted: #4b5563;
+  --svg-grid: #d1d5db;
+  --svg-grid-light: #f0f1f3;
+  --svg-label: #9ca3af;
+
+  --node-bg: #f0f1f3;
+  --node-bg-deep: #ffffff;
+  --node-stroke: #9ca3af;
+  --node-glow-forward: #0891b2;
+  --node-glow-forward-bg: #d4f0f6;
+  --node-glow-backward: #e11d48;
+  --node-glow-backward-bg: #fde2e9;
+  --node-value: #059669;
+  --node-grad: #ea580c;
+  --node-grad-bg: #fde8d8;
+  --node-label: #374151;
+  --node-label-forward: #0e7490;
+  --node-label-backward: #be123c;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL STYLES (use CSS vars)
+   ═══════════════════════════════════════════════════════════════ */
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0f172a;
+  scrollbar-color: var(--shell-border) var(--shell-bg);
 }
 
 body {
   margin: 0;
-  background: #0f172a;
-  color: #f1f5f9;
+  background: var(--shell-bg);
+  color: var(--shell-text-heading);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -63,15 +467,15 @@ body {
 }
 
 .viz-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: var(--viz-card-bg);
+  border: 1px solid var(--viz-card-border);
   border-radius: 12px;
   padding: 20px;
   backdrop-filter: blur(8px);
 }
 
-.glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
-.glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
-.glow-violet { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
-.glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
-.glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); }
+.glow-cyan { box-shadow: 0 0 20px var(--glow-cyan); }
+.glow-amber { box-shadow: 0 0 20px var(--glow-amber); }
+.glow-violet { box-shadow: 0 0 20px var(--glow-violet); }
+.glow-emerald { box-shadow: 0 0 20px var(--glow-emerald); }
+.glow-rose { box-shadow: 0 0 20px var(--glow-rose); }

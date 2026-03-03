@@ -143,7 +143,7 @@ export default function Hyperparameters() {
           </div>
 
           {/* Bars */}
-          <div className="flex items-end justify-center gap-px h-32 ml-3">
+          <div className="flex justify-center gap-px h-32 ml-3">
             {gaussianHistogram.counts.map((count, i) => {
               const height = gaussianHistogram.maxCount > 0 ? (count / gaussianHistogram.maxCount) * 100 : 0;
               const binCenter = gaussianHistogram.min + (i + 0.5) * gaussianHistogram.binWidth;

@@ -130,8 +130,8 @@ function SoftmaxVisualization() {
 
       {/* Bar charts side by side */}
       <div className="flex gap-4">
-        <BarChart data={logits} label="Before (raw logits)" color="#fbbf24" symmetric />
-        <BarChart data={probs} label="After (probabilities)" color="#34d399" />
+        <BarChart data={logits} label="Before (raw logits)" color="var(--accent-amber)" symmetric />
+        <BarChart data={probs} label="After (probabilities)" color="var(--accent-emerald)" />
       </div>
 
       <p className="text-slate-400 text-sm mt-4 leading-relaxed">
@@ -265,8 +265,8 @@ function RMSNormVisualization() {
 
       {/* Bar charts side by side */}
       <div className="flex gap-4">
-        <BarChart data={values} label="Before (input)" color="#a78bfa" />
-        <BarChart data={output} label="After (normalized)" color="#34d399" />
+        <BarChart data={values} label="Before (input)" color="var(--accent-violet)" />
+        <BarChart data={output} label="After (normalized)" color="var(--accent-emerald)" />
       </div>
 
       <p className="text-slate-400 text-sm mt-4 leading-relaxed">

@@ -67,9 +67,9 @@ function VectorCells({ values, color }: { values: number[]; color: string }) {
     <div className="flex gap-px">
       {values.map((v, i) => {
         const intensity = Math.abs(v) / max;
-        const bg = v >= 0
-          ? `rgba(${color === 'cyan' ? '34,211,238' : color === 'violet' ? '167,139,250' : '251,191,36'}, ${intensity * 0.9 + 0.1})`
-          : `rgba(${color === 'cyan' ? '34,211,238' : color === 'violet' ? '167,139,250' : '251,191,36'}, ${intensity * 0.5 + 0.1})`;
+        const cssVar = color === 'cyan' ? 'var(--accent-cyan)' : color === 'violet' ? 'var(--accent-violet)' : 'var(--accent-amber)';
+        const pct = v >= 0 ? Math.round((intensity * 0.9 + 0.1) * 100) : Math.round((intensity * 0.5 + 0.1) * 100);
+        const bg = `color-mix(in srgb, ${cssVar} ${pct}%, transparent)`;
         return (
           <div
             key={i}
@@ -104,7 +104,7 @@ function MiniBarChart({ values, color, width = 80, height = 24 }: { values: numb
           />
         );
       })}
-      <line x1={0} y1={height / 2} x2={width} y2={height / 2} stroke="#475569" strokeWidth={0.5} />
+      <line x1={0} y1={height / 2} x2={width} y2={height / 2} stroke="var(--node-stroke)" strokeWidth={0.5} />
     </svg>
   );
 }
@@ -117,12 +117,12 @@ function AttentionHeatmap({ weights }: { weights: number[][] }) {
     <svg width={labelW + cellSize * 2 + 4} height={labelW + cellSize * 2 + 4}>
       {/* Column labels */}
       {labels.map((l, i) => (
-        <text key={`cl${i}`} x={labelW + i * cellSize + cellSize / 2} y={12} textAnchor="middle" fill="#94a3b8" fontSize={9}>{l}</text>
+        <text key={`cl${i}`} x={labelW + i * cellSize + cellSize / 2} y={12} textAnchor="middle" fill="var(--svg-muted)" fontSize={9}>{l}</text>
       ))}
       {/* Row labels + cells */}
       {weights.map((row, ri) => (
         <g key={`r${ri}`}>
-          <text x={labelW - 4} y={labelW + ri * cellSize + cellSize / 2 + 3} textAnchor="end" fill="#94a3b8" fontSize={9}>{labels[ri]}</text>
+          <text x={labelW - 4} y={labelW + ri * cellSize + cellSize / 2 + 3} textAnchor="end" fill="var(--svg-muted)" fontSize={9}>{labels[ri]}</text>
           {row.map((w, ci) => (
             <g key={`c${ci}`}>
               <rect
@@ -131,13 +131,13 @@ function AttentionHeatmap({ weights }: { weights: number[][] }) {
                 width={cellSize - 2}
                 height={cellSize - 2}
                 rx={3}
-                fill={`rgba(167,139,250,${w * 0.9 + 0.1})`}
+                fill={`color-mix(in srgb, var(--accent-violet) ${Math.round((w * 0.9 + 0.1) * 100)}%, transparent)`}
               />
               <text
                 x={labelW + ci * cellSize + (cellSize - 2) / 2}
                 y={labelW + ri * cellSize + (cellSize - 2) / 2 + 3}
                 textAnchor="middle"
-                fill="#e2e8f0"
+                fill="var(--shell-text-bright)"
                 fontSize={8}
                 fontWeight={600}
               >
@@ -157,28 +157,28 @@ function MLPDiamond() {
     <svg width={w} height={h}>
       {/* Input layer (16 nodes) */}
       {Array.from({ length: 8 }).map((_, i) => (
-        <circle key={`in${i}`} cx={4 + i * 6} cy={h / 2} r={2} fill="#60a5fa" opacity={0.7} />
+        <circle key={`in${i}`} cx={4 + i * 6} cy={h / 2} r={2} fill="var(--accent-blue)" opacity={0.7} />
       ))}
       {/* Expand lines */}
-      <line x1={52} y1={h / 2} x2={65} y2={8} stroke="#475569" strokeWidth={0.5} />
-      <line x1={52} y1={h / 2} x2={65} y2={h - 8} stroke="#475569" strokeWidth={0.5} />
+      <line x1={52} y1={h / 2} x2={65} y2={8} stroke="var(--node-stroke)" strokeWidth={0.5} />
+      <line x1={52} y1={h / 2} x2={65} y2={h - 8} stroke="var(--node-stroke)" strokeWidth={0.5} />
       {/* Hidden layer (64 nodes, show 16) */}
       {Array.from({ length: 16 }).map((_, i) => (
-        <circle key={`hid${i}`} cx={65 + i * 3.5} cy={8 + i * ((h - 16) / 15)} r={1.5} fill="#a78bfa" opacity={0.6} />
+        <circle key={`hid${i}`} cx={65 + i * 3.5} cy={8 + i * ((h - 16) / 15)} r={1.5} fill="var(--accent-violet)" opacity={0.6} />
       ))}
       {/* ReLU label */}
-      <text x={128} y={h / 2 - 4} textAnchor="middle" fill="#34d399" fontSize={8} fontWeight={600}>ReLU</text>
+      <text x={128} y={h / 2 - 4} textAnchor="middle" fill="var(--accent-emerald)" fontSize={8} fontWeight={600}>ReLU</text>
       {/* Shrink lines */}
-      <line x1={125} y1={8} x2={140} y2={h / 2} stroke="#475569" strokeWidth={0.5} />
-      <line x1={125} y1={h - 8} x2={140} y2={h / 2} stroke="#475569" strokeWidth={0.5} />
+      <line x1={125} y1={8} x2={140} y2={h / 2} stroke="var(--node-stroke)" strokeWidth={0.5} />
+      <line x1={125} y1={h - 8} x2={140} y2={h / 2} stroke="var(--node-stroke)" strokeWidth={0.5} />
       {/* Output layer (16 nodes) */}
       {Array.from({ length: 8 }).map((_, i) => (
-        <circle key={`out${i}`} cx={142 + i * 6} cy={h / 2} r={2} fill="#60a5fa" opacity={0.7} />
+        <circle key={`out${i}`} cx={142 + i * 6} cy={h / 2} r={2} fill="var(--accent-blue)" opacity={0.7} />
       ))}
       {/* Labels */}
-      <text x={24} y={h - 2} textAnchor="middle" fill="#64748b" fontSize={7}>16</text>
-      <text x={95} y={h - 2} textAnchor="middle" fill="#64748b" fontSize={7}>64</text>
-      <text x={166} y={h - 2} textAnchor="middle" fill="#64748b" fontSize={7}>16</text>
+      <text x={24} y={h - 2} textAnchor="middle" fill="var(--svg-label)" fontSize={7}>16</text>
+      <text x={95} y={h - 2} textAnchor="middle" fill="var(--svg-label)" fontSize={7}>64</text>
+      <text x={166} y={h - 2} textAnchor="middle" fill="var(--svg-label)" fontSize={7}>16</text>
     </svg>
   );
 }
@@ -217,11 +217,11 @@ function StageVisual({ step, data }: { step: number; data: ReturnType<typeof use
     case 3:
       return (
         <div className="flex items-center gap-2 flex-wrap">
-          <MiniBarChart values={data.tokEmb} color="#22d3ee" />
+          <MiniBarChart values={data.tokEmb} color="var(--accent-cyan)" />
           <span className="text-amber-400 font-bold text-sm">+</span>
-          <MiniBarChart values={data.posEmb} color="#a78bfa" />
+          <MiniBarChart values={data.posEmb} color="var(--accent-violet)" />
           <span className="text-amber-400 font-bold text-sm">=</span>
-          <MiniBarChart values={data.combined} color="#fbbf24" />
+          <MiniBarChart values={data.combined} color="var(--accent-amber)" />
         </div>
       );
     case 4:
@@ -229,12 +229,12 @@ function StageVisual({ step, data }: { step: number; data: ReturnType<typeof use
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex flex-col items-center gap-0.5">
             <span className="text-[9px] text-slate-600">before</span>
-            <MiniBarChart values={data.combined} color="#64748b" />
+            <MiniBarChart values={data.combined} color="var(--svg-label)" />
           </div>
           <span className="text-violet-400 font-bold text-lg">{'\u2192'}</span>
           <div className="flex flex-col items-center gap-0.5">
             <span className="text-[9px] text-slate-600">after</span>
-            <MiniBarChart values={data.normed} color="#a78bfa" />
+            <MiniBarChart values={data.normed} color="var(--accent-violet)" />
           </div>
         </div>
       );
@@ -251,11 +251,11 @@ function StageVisual({ step, data }: { step: number; data: ReturnType<typeof use
     case 6:
       return (
         <div className="flex items-center gap-2 flex-wrap">
-          <MiniBarChart values={data.attnOut} color="#a78bfa" />
+          <MiniBarChart values={data.attnOut} color="var(--accent-violet)" />
           <span className="text-amber-400 font-bold text-sm">+</span>
-          <MiniBarChart values={data.normed} color="#64748b" />
+          <MiniBarChart values={data.normed} color="var(--svg-label)" />
           <span className="text-amber-400 font-bold text-sm">=</span>
-          <MiniBarChart values={data.residual1} color="#fbbf24" />
+          <MiniBarChart values={data.residual1} color="var(--accent-amber)" />
         </div>
       );
     case 7:

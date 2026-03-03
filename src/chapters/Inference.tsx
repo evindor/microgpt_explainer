@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import Layout from '../components/Layout';
 import CodePanel from '../components/CodePanel';
+import InferenceViz from '../components/InferenceViz';
 
 /* ── softmax ──────────────────────────────────────────────── */
 function softmax(logits: number[]): number[] {
@@ -37,62 +38,11 @@ const BASE_LOGITS: number[] = (() => {
   return logits;
 })();
 
-/* Pre-defined generated names for sampling demo */
-const SAMPLE_NAMES = ['kamon', 'ann', 'karai', 'vialan', 'anna', 'keylen'];
-
-/* Build step-by-step data for a generated name */
-interface GenerationStep {
-  token: string;
-  tokenIdx: number;
-  probs: number[];   // probability distribution at this step
-  sequence: string[]; // accumulated tokens so far including this step
-}
-
-function buildSteps(name: string): GenerationStep[] {
-  const steps: GenerationStep[] = [];
-  const seq: string[] = ['BOS'];
-  for (let i = 0; i < name.length; i++) {
-    const ch = name[i];
-    const idx = ch.charCodeAt(0) - 97; // a=0
-    // fake probabilities: make the sampled token have highest prob, distribute rest
-    const probs = new Array(VOCAB_SIZE).fill(0);
-    probs[idx] = 0.35 + Math.random() * 0.25;
-    // distribute the remaining probability
-    const remaining = 1 - probs[idx];
-    for (let j = 0; j < VOCAB_SIZE; j++) {
-      if (j !== idx) {
-        probs[j] = remaining / (VOCAB_SIZE - 1) + (Math.sin(j * 1.3 + i) * 0.005);
-      }
-    }
-    // normalize
-    const total = probs.reduce((a, b) => a + b, 0);
-    for (let j = 0; j < VOCAB_SIZE; j++) probs[j] = Math.max(0, probs[j] / total);
-    seq.push(ch);
-    steps.push({ token: ch, tokenIdx: idx, probs: [...probs], sequence: [...seq] });
-  }
-  // Final step: BOS (end)
-  const finalProbs = new Array(VOCAB_SIZE).fill(0);
-  finalProbs[26] = 0.55;
-  const rem = 1 - finalProbs[26];
-  for (let j = 0; j < VOCAB_SIZE; j++) {
-    if (j !== 26) finalProbs[j] = rem / (VOCAB_SIZE - 1);
-  }
-  seq.push('BOS');
-  steps.push({ token: 'BOS', tokenIdx: 26, probs: finalProbs, sequence: [...seq] });
-  return steps;
-}
 
 /* ════════════════════════════════════════════════════════════ */
 export default function Inference() {
   /* ── Temperature state ───────────────────────────────────── */
   const [temperature, setTemperature] = useState(0.5);
-
-  /* ── Sampling demo state ─────────────────────────────────── */
-  const [currentSample, setCurrentSample] = useState(0);
-  const [currentStep, setCurrentStep] = useState(-1); // -1 = not running
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const steps = useMemo(() => buildSteps(SAMPLE_NAMES[currentSample]), [currentSample]);
 
   /* ── Temperature visualization ───────────────────────────── */
   const adjustedLogits = useMemo(
@@ -108,27 +58,6 @@ export default function Inference() {
     if (temperature <= 1.2) return 'Moderate -- decent spread across likely tokens';
     return 'Very random -- almost uniform distribution';
   }, [temperature]);
-
-  /* ── Sampling animation ──────────────────────────────────── */
-  const startGeneration = useCallback(() => {
-    setCurrentSample(prev => (prev + 1) % SAMPLE_NAMES.length);
-    setCurrentStep(0);
-    setIsGenerating(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isGenerating || currentStep < 0) return;
-    const totalSteps = steps.length;
-    if (currentStep >= totalSteps) {
-      setIsGenerating(false);
-      return;
-    }
-    const timer = setTimeout(() => {
-      setCurrentStep(prev => prev + 1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isGenerating, currentStep, steps.length]);
-
 
   /* ── SVG Bar Chart dimensions for temperature viz ────────── */
   const chartW = 540;
@@ -197,7 +126,7 @@ export default function Inference() {
       <div className="viz-card glow-amber flex justify-center">
         <svg width={340} height={200} viewBox="0 0 340 200">
           {/* Circle background */}
-          <circle cx={170} cy={100} r={75} fill="none" stroke="#334155" strokeWidth={1.5} strokeDasharray="4 3" />
+          <circle cx={170} cy={100} r={75} fill="none" stroke="var(--svg-grid)" strokeWidth={1.5} strokeDasharray="4 3" />
 
           {/* Step nodes */}
           {[
@@ -215,14 +144,14 @@ export default function Inference() {
                 width={72}
                 height={32}
                 rx={8}
-                fill={i === 3 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(30, 41, 59, 0.9)'}
-                stroke={i === 3 ? '#34d399' : '#f59e0b'}
+                fill={i === 3 ? 'color-mix(in srgb, var(--accent-emerald) 20%, transparent)' : 'var(--shell-surface)'}
+                stroke={i === 3 ? 'var(--accent-emerald)' : 'var(--accent-amber-strong)'}
                 strokeWidth={1.5}
               />
-              <text x={node.x} y={node.y - 2} textAnchor="middle" fill={i === 3 ? '#34d399' : '#fbbf24'} fontSize={11} fontWeight={600} fontFamily="monospace">
+              <text x={node.x} y={node.y - 2} textAnchor="middle" fill={i === 3 ? 'var(--accent-emerald)' : 'var(--accent-amber)'} fontSize={11} fontWeight={600} fontFamily="monospace">
                 {node.label}
               </text>
-              <text x={node.x} y={node.y + 10} textAnchor="middle" fill="#94a3b8" fontSize={9} fontFamily="sans-serif">
+              <text x={node.x} y={node.y + 10} textAnchor="middle" fill="var(--svg-muted)" fontSize={9} fontFamily="sans-serif">
                 {node.sub}
               </text>
             </g>
@@ -231,25 +160,25 @@ export default function Inference() {
           {/* Arrows connecting steps */}
           <defs>
             <marker id="arrowOrange" markerWidth={8} markerHeight={6} refX={7} refY={3} orient="auto">
-              <path d="M0,0 L8,3 L0,6 Z" fill="#f59e0b" />
+              <path d="M0,0 L8,3 L0,6 Z" fill="var(--accent-amber-strong)" />
             </marker>
           </defs>
           {/* BOS -> Forward */}
-          <line x1={206} y1={30} x2={225} y2={48} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <line x1={206} y1={30} x2={225} y2={48} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           {/* Forward -> Probs */}
-          <line x1={265} y1={76} x2={270} y2={118} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <line x1={265} y1={76} x2={270} y2={118} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           {/* Probs -> Sample */}
-          <line x1={245} y1={155} x2={210} y2={170} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <line x1={245} y1={155} x2={210} y2={170} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           {/* Sample -> Append */}
-          <line x1={130} y1={170} x2={110} y2={155} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <line x1={130} y1={170} x2={110} y2={155} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           {/* Append -> Done? */}
-          <line x1={75} y1={118} x2={80} y2={76} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <line x1={75} y1={118} x2={80} y2={76} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           {/* Done? -> Forward (loop) */}
-          <line x1={121} y1={52} x2={215} y2={50} stroke="#f59e0b" strokeWidth={1.5} markerEnd="url(#arrowOrange)" strokeDasharray="5 3" />
+          <line x1={121} y1={52} x2={215} y2={50} stroke="var(--accent-amber-strong)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" strokeDasharray="5 3" />
 
           {/* Output arrow from Done? */}
-          <line x1={60} y1={48} x2={30} y2={25} stroke="#34d399" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
-          <text x={15} y={18} fill="#34d399" fontSize={10} fontWeight={600} fontFamily="monospace">output</text>
+          <line x1={60} y1={48} x2={30} y2={25} stroke="var(--accent-emerald)" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
+          <text x={15} y={18} fill="var(--accent-emerald)" fontSize={10} fontWeight={600} fontFamily="monospace">output</text>
         </svg>
       </div>
 
@@ -302,7 +231,7 @@ export default function Inference() {
             onChange={e => setTemperature(parseFloat(e.target.value))}
             className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-emerald-400"
             style={{
-              background: `linear-gradient(to right, #06b6d4, #34d399 ${((temperature - 0.1) / 1.9) * 100}%, #1e293b ${((temperature - 0.1) / 1.9) * 100}%)`,
+              background: `linear-gradient(to right, var(--accent-cyan-strong), var(--accent-emerald) ${((temperature - 0.1) / 1.9) * 100}%, var(--shell-surface) ${((temperature - 0.1) / 1.9) * 100}%)`,
             }}
           />
           <span className="text-sm font-mono text-emerald-400 font-bold w-10 text-right">
@@ -340,7 +269,7 @@ export default function Inference() {
                       x={x + (barW - barPad) / 2}
                       y={y - 3}
                       textAnchor="middle"
-                      fill="#94a3b8"
+                      fill="var(--svg-muted)"
                       fontSize={8}
                       fontFamily="monospace"
                     >
@@ -352,7 +281,7 @@ export default function Inference() {
                     x={x + (barW - barPad) / 2}
                     y={chartH - 3}
                     textAnchor="middle"
-                    fill={i === 26 ? '#a78bfa' : '#64748b'}
+                    fill={i === 26 ? 'var(--accent-violet)' : 'var(--svg-label)'}
                     fontSize={9}
                     fontWeight={i === 26 ? 700 : 400}
                     fontFamily="monospace"
@@ -405,92 +334,12 @@ export default function Inference() {
         </div>
       </div>
 
-      {/* ── Sampling Demo ───────────────────────────────────── */}
+      {/* ── Real Inference ──────────────────────────────────── */}
       <div className="viz-card glow-cyan">
         <h2 className="text-sm font-semibold text-cyan-400 uppercase tracking-wider mb-4">
-          Sampling Demo
+          Real Inference
         </h2>
-
-        <button
-          onClick={startGeneration}
-          disabled={isGenerating}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-            isGenerating
-              ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-white hover:from-cyan-400 hover:to-emerald-400 shadow-lg shadow-cyan-500/20'
-          }`}
-        >
-          {isGenerating ? 'Generating...' : 'Generate Name'}
-        </button>
-
-        {/* Step display */}
-        {currentStep >= 0 && (
-          <div className="mt-4 space-y-3">
-            {/* Growing token sequence */}
-            <div className="flex flex-wrap gap-1.5 items-center min-h-[40px]">
-              {steps.slice(0, Math.min(currentStep + 1, steps.length)).map((step, i) => (
-                <div key={i} className="flex items-center gap-1">
-                  {i === 0 && (
-                    <span
-                      className="px-2 py-1 rounded text-xs font-mono font-bold bg-violet-500/20 border border-violet-400/50 text-violet-300"
-                      style={{ animation: 'fadeIn 0.3s ease-out' }}
-                    >
-                      [BOS]
-                    </span>
-                  )}
-                  <span className="text-slate-600 text-xs">&rarr;</span>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-mono font-bold ${
-                      step.token === 'BOS'
-                        ? 'bg-violet-500/20 border border-violet-400/50 text-violet-300'
-                        : 'bg-emerald-500/20 border border-emerald-400/50 text-emerald-300'
-                    }`}
-                    style={{ animation: 'fadeIn 0.35s ease-out' }}
-                  >
-                    {step.token === 'BOS' ? '[BOS]' : step.token}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Mini probability bar chart for current step */}
-            {currentStep < steps.length && (
-              <div>
-                <p className="text-[10px] text-slate-500 font-mono mb-1">
-                  Step {Math.min(currentStep + 1, steps.length)}: probabilities &rarr; sampled &lsquo;
-                  <span className="text-cyan-400">{steps[Math.min(currentStep, steps.length - 1)].token}</span>&rsquo;
-                </p>
-                <svg width={400} height={50} className="bg-slate-900/40 rounded">
-                  {steps[Math.min(currentStep, steps.length - 1)].probs.map((p, i) => {
-                    const bw = 400 / VOCAB_SIZE;
-                    const bh = p * 180;
-                    const isSampled = i === steps[Math.min(currentStep, steps.length - 1)].tokenIdx;
-                    return (
-                      <rect
-                        key={i}
-                        x={i * bw + 1}
-                        y={46 - bh}
-                        width={Math.max(bw - 2, 1)}
-                        height={Math.max(bh, 0.5)}
-                        fill={isSampled ? '#34d399' : '#164e63'}
-                        rx={1}
-                      />
-                    );
-                  })}
-                </svg>
-              </div>
-            )}
-
-            {/* Show final result */}
-            {currentStep >= steps.length && (
-              <div className="bg-slate-900/60 rounded-lg px-4 py-3 border border-emerald-400/30">
-                <p className="text-sm text-slate-300 font-mono">
-                  Generated: <span className="text-emerald-400 font-bold text-base">{SAMPLE_NAMES[currentSample]}</span>
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+        <InferenceViz />
       </div>
 
       {/* ── Hallucination Note ──────────────────────────────── */}
@@ -504,7 +353,7 @@ export default function Inference() {
             <p className="text-sm text-slate-300 leading-relaxed mb-2">
               Notice: the model generates names that <span className="text-amber-300 font-semibold">LOOK real</span> but{' '}
               <span className="text-rose-400 font-semibold">DON&apos;T EXIST</span>.{' '}
-              &lsquo;Kamon&rsquo;, &lsquo;Vialan&rsquo;, &lsquo;Keylen&rsquo; &mdash; they follow English name patterns but were never in the training data.
+              They follow English name patterns but were likely never in the training data.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">
               This is exactly how ChatGPT &lsquo;hallucinates&rsquo;: it generates text that is{' '}

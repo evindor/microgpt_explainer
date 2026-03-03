@@ -29,13 +29,10 @@ function buildTable(rows: number, cols: number, seed: number): number[][] {
 
 /* ── colour helpers (blue ← 0 → red) ───────────────────────── */
 function heatColor(v: number): string {
-  const t = Math.max(-1, Math.min(1, v / 0.1)); // normalise to -1…1
-  if (t < 0) {
-    const a = -t;
-    return `rgb(${Math.round(59 + (255 - 59) * (1 - a))}, ${Math.round(130 + (255 - 130) * (1 - a))}, 246)`;
-  }
-  const a = t;
-  return `rgb(246, ${Math.round(130 + (255 - 130) * (1 - a))}, ${Math.round(59 + (255 - 59) * (1 - a))})`;
+  const t = Math.max(-1, Math.min(1, v / 0.1));
+  const pct = Math.round(Math.abs(t) * 80 + 20);
+  if (t < 0) return `color-mix(in srgb, var(--accent-blue) ${pct}%, transparent)`;
+  return `color-mix(in srgb, var(--accent-rose) ${pct}%, transparent)`;
 }
 
 /* ── simple SVG bar chart component ─────────────────────────── */
@@ -61,11 +58,11 @@ function BarChart({
       )}
       <svg width={width} height={height} className="bg-slate-800/60 rounded">
         {/* zero line */}
-        <line x1={0} x2={width} y1={mid} y2={mid} stroke="#475569" strokeWidth={1} />
+        <line x1={0} x2={width} y1={mid} y2={mid} stroke="var(--node-stroke)" strokeWidth={1} />
         {values.map((v, i) => {
           const barH = Math.abs(v) * scale;
           const y = v >= 0 ? mid - barH : mid;
-          const fill = v >= 0 ? '#34d399' : '#fb7185';
+          const fill = v >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)';
           return (
             <rect
               key={i}

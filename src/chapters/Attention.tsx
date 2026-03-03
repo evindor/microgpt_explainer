@@ -178,8 +178,8 @@ function AttentionHeatmap() {
                       width: cellSize,
                       height: cellSize,
                       backgroundColor: isMasked
-                        ? 'rgba(15, 23, 42, 0.9)'
-                        : `rgba(245, 158, 11, ${val * 0.85 + 0.05})`,
+                        ? 'color-mix(in srgb, var(--shell-bg) 90%, transparent)'
+                        : `color-mix(in srgb, var(--accent-amber-strong) ${Math.round((val * 0.85 + 0.05) * 100)}%, transparent)`,
                     }}
                     onMouseEnter={() => handleMouseEnter(q, k)}
                     onMouseLeave={handleMouseLeave}
@@ -216,19 +216,19 @@ function AttentionHeatmap() {
       {/* Legend */}
       <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }} />
+          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-amber-strong) 10%, transparent)' }} />
           <span>Low attention</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'rgba(245, 158, 11, 0.55)' }} />
+          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-amber-strong) 55%, transparent)' }} />
           <span>Medium</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'rgba(245, 158, 11, 0.9)' }} />
+          <div className="w-4 h-4 rounded border border-slate-700" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-amber-strong) 90%, transparent)' }} />
           <span>High attention</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded border border-slate-700 masked-cell" style={{ backgroundColor: 'rgba(15, 23, 42, 0.9)' }} />
+          <div className="w-4 h-4 rounded border border-slate-700 masked-cell" style={{ backgroundColor: 'color-mix(in srgb, var(--shell-bg) 90%, transparent)' }} />
           <span>Masked (future)</span>
         </div>
       </div>
@@ -240,10 +240,10 @@ function AttentionHeatmap() {
             45deg,
             transparent,
             transparent 3px,
-            rgba(51, 65, 85, 0.4) 3px,
-            rgba(51, 65, 85, 0.4) 5px
+            color-mix(in srgb, var(--svg-grid) 40%, transparent) 3px,
+            color-mix(in srgb, var(--svg-grid) 40%, transparent) 5px
           ) !important;
-          background-color: rgba(15, 23, 42, 0.9) !important;
+          background-color: color-mix(in srgb, var(--shell-bg) 90%, transparent) !important;
           background-blend-mode: normal;
         }
       `}</style>
@@ -340,8 +340,8 @@ function AttentionFlowDiagram() {
             {['0.22', '0.06', '0.12', '0.60'].map((w, i) => (
               <div key={i} className="px-2 py-1.5 rounded text-[10px] font-mono font-semibold"
                    style={{
-                     backgroundColor: `rgba(245, 158, 11, ${parseFloat(w) * 0.9 + 0.08})`,
-                     color: parseFloat(w) > 0.4 ? '#1e293b' : '#fde68a',
+                     backgroundColor: `color-mix(in srgb, var(--accent-amber-strong) ${Math.round((parseFloat(w) * 0.9 + 0.08) * 100)}%, transparent)`,
+                     color: parseFloat(w) > 0.4 ? 'var(--shell-surface)' : 'var(--accent-amber)',
                    }}>
                 {w}
               </div>
@@ -360,7 +360,7 @@ function AttentionFlowDiagram() {
           <div className="flex gap-1">
             {[0.22, 0.06, 0.12, 0.60].map((w, i) => (
               <div key={i} className="px-1.5 py-1 rounded text-[10px] font-mono text-amber-300"
-                   style={{ backgroundColor: `rgba(245, 158, 11, ${w * 0.9 + 0.08})`, color: w > 0.4 ? '#1e293b' : '#fde68a' }}>
+                   style={{ backgroundColor: `color-mix(in srgb, var(--accent-amber-strong) ${Math.round((w * 0.9 + 0.08) * 100)}%, transparent)`, color: w > 0.4 ? 'var(--shell-surface)' : 'var(--accent-amber)' }}>
                 {w.toFixed(2)}
               </div>
             ))}
@@ -662,8 +662,8 @@ export default function Attention() {
                 {['0.11', '0.27', '0.42', '0.20'].map((s, i) => (
                   <div key={i} className={`px-1.5 py-1 rounded text-[10px] font-mono font-semibold`}
                        style={{
-                         backgroundColor: `rgba(34, 197, 94, ${parseFloat(s) * 0.8 + 0.08})`,
-                         color: parseFloat(s) > 0.35 ? '#1e293b' : '#bbf7d0',
+                         backgroundColor: `color-mix(in srgb, var(--accent-emerald) ${Math.round((parseFloat(s) * 0.8 + 0.08) * 100)}%, transparent)`,
+                         color: parseFloat(s) > 0.35 ? 'var(--shell-surface)' : 'var(--accent-emerald)',
                        }}>{s}</div>
                 ))}
               </div>

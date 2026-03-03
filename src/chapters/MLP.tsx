@@ -49,18 +49,18 @@ function ReLUVisualization() {
 
       <svg width={W} height={H} className="w-full" viewBox={`0 0 ${W} ${H}`}>
         {/* Negative region shading */}
-        <path d={negFill} fill="rgba(244, 63, 94, 0.08)" />
+        <path d={negFill} fill="color-mix(in srgb, var(--accent-rose) 8%, transparent)" />
         {/* Positive region shading */}
-        <path d={posFill} fill="rgba(52, 211, 153, 0.08)" />
+        <path d={posFill} fill="color-mix(in srgb, var(--accent-emerald) 8%, transparent)" />
 
         {/* Grid lines */}
         {[-2, -1, 0, 1, 2, 3].map(v => (
           <line key={`gx-${v}`} x1={toSvgX(v)} y1={toSvgY(yMax)} x2={toSvgX(v)} y2={toSvgY(yMin)}
-            stroke="#334155" strokeWidth={v === 0 ? 1.5 : 0.5} strokeDasharray={v === 0 ? '' : '4,4'} />
+            stroke="var(--svg-grid)" strokeWidth={v === 0 ? 1.5 : 0.5} strokeDasharray={v === 0 ? '' : '4,4'} />
         ))}
         {[0, 1, 2, 3].map(v => (
           <line key={`gy-${v}`} x1={toSvgX(xMin)} y1={toSvgY(v)} x2={toSvgX(xMax)} y2={toSvgY(v)}
-            stroke="#334155" strokeWidth={v === 0 ? 1.5 : 0.5} strokeDasharray={v === 0 ? '' : '4,4'} />
+            stroke="var(--svg-grid)" strokeWidth={v === 0 ? 1.5 : 0.5} strokeDasharray={v === 0 ? '' : '4,4'} />
         ))}
 
         {/* Axis labels */}
@@ -74,19 +74,19 @@ function ReLUVisualization() {
         ))}
 
         {/* ReLU curve: negative portion (red) */}
-        <polyline points={negPoints} fill="none" stroke="#fb7185" strokeWidth={2.5} />
+        <polyline points={negPoints} fill="none" stroke="var(--accent-rose)" strokeWidth={2.5} />
         {/* ReLU curve: positive portion (green) */}
-        <polyline points={posPoints} fill="none" stroke="#34d399" strokeWidth={2.5} />
+        <polyline points={posPoints} fill="none" stroke="var(--accent-emerald)" strokeWidth={2.5} />
 
         {/* Dashed line from dot to axes */}
         <line x1={dotX} y1={dotY} x2={dotX} y2={toSvgY(0)}
-          stroke="#94a3b8" strokeWidth={0.8} strokeDasharray="3,3" opacity={0.5} />
+          stroke="var(--svg-muted)" strokeWidth={0.8} strokeDasharray="3,3" opacity={0.5} />
         <line x1={dotX} y1={dotY} x2={toSvgX(0)} y2={dotY}
-          stroke="#94a3b8" strokeWidth={0.8} strokeDasharray="3,3" opacity={0.5} />
+          stroke="var(--svg-muted)" strokeWidth={0.8} strokeDasharray="3,3" opacity={0.5} />
 
         {/* Interactive dot */}
         <circle cx={dotX} cy={dotY} r={6}
-          fill={xVal >= 0 ? '#34d399' : '#fb7185'}
+          fill={xVal >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)'}
           stroke="#fff" strokeWidth={2} className="drop-shadow-lg" />
 
         {/* Labels */}
@@ -159,25 +159,25 @@ function ResidualDiagram() {
         </text>
 
         {/* Input arrow to split point */}
-        <line x1={70} y1={110} x2={110} y2={110} stroke="#94a3b8" strokeWidth={2}
+        <line x1={70} y1={110} x2={110} y2={110} stroke="var(--svg-muted)" strokeWidth={2}
           markerEnd="url(#arrowGray)" />
 
         {/* Split circle */}
-        <circle cx={120} cy={110} r={8} fill="none" stroke="#60a5fa" strokeWidth={2} />
+        <circle cx={120} cy={110} r={8} fill="none" stroke="var(--accent-blue)" strokeWidth={2} />
 
         {/* Upper path: skip connection */}
         <path d="M 128 110 L 128 50 L 280 50 L 280 110"
-          fill="none" stroke="#22d3ee" strokeWidth={2} strokeDasharray="6,4" />
+          fill="none" stroke="var(--accent-cyan)" strokeWidth={2} strokeDasharray="6,4" />
         <text x={200} y={40} textAnchor="middle" className="fill-cyan-400 text-[10px] font-semibold">
           SKIP CONNECTION (identity)
         </text>
 
         {/* Lower path: through block */}
-        <line x1={128} y1={110} x2={155} y2={110} stroke="#94a3b8" strokeWidth={2} />
+        <line x1={128} y1={110} x2={155} y2={110} stroke="var(--svg-muted)" strokeWidth={2} />
 
         {/* Block box */}
         <rect x={155} y={85} width={100} height={50} rx={8}
-          fill="rgba(139, 92, 246, 0.15)" stroke="#a78bfa" strokeWidth={1.5} />
+          fill="color-mix(in srgb, var(--accent-violet) 15%, transparent)" stroke="var(--accent-violet)" strokeWidth={1.5} />
         <text x={205} y={107} textAnchor="middle" className="fill-violet-400 text-[11px] font-semibold">
           Attention
         </text>
@@ -186,14 +186,14 @@ function ResidualDiagram() {
         </text>
 
         {/* Block output arrow */}
-        <line x1={255} y1={110} x2={272} y2={110} stroke="#94a3b8" strokeWidth={2} />
+        <line x1={255} y1={110} x2={272} y2={110} stroke="var(--svg-muted)" strokeWidth={2} />
 
         {/* Add circle */}
-        <circle cx={280} cy={110} r={14} fill="rgba(52, 211, 153, 0.15)" stroke="#34d399" strokeWidth={2} />
+        <circle cx={280} cy={110} r={14} fill="color-mix(in srgb, var(--accent-emerald) 15%, transparent)" stroke="var(--accent-emerald)" strokeWidth={2} />
         <text x={280} y={115} textAnchor="middle" className="fill-emerald-400 text-sm font-bold">+</text>
 
         {/* Output arrow */}
-        <line x1={294} y1={110} x2={340} y2={110} stroke="#94a3b8" strokeWidth={2}
+        <line x1={294} y1={110} x2={340} y2={110} stroke="var(--svg-muted)" strokeWidth={2}
           markerEnd="url(#arrowGray)" />
 
         {/* Output label */}
@@ -213,7 +213,7 @@ function ResidualDiagram() {
         <defs>
           <marker id="arrowGray" viewBox="0 0 10 7" refX={9} refY={3.5}
             markerWidth={8} markerHeight={6} orient="auto-start-auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+            <polygon points="0 0, 10 3.5, 0 7" fill="var(--svg-muted)" />
           </marker>
         </defs>
       </svg>
@@ -264,11 +264,11 @@ export default function MLP() {
             <div className="text-slate-500 text-[10px]">input</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
             <defs>
               <marker id="arrMlp" viewBox="0 0 10 7" refX={9} refY={3.5}
                 markerWidth={7} markerHeight={5} orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                <polygon points="0 0, 10 3.5, 0 7" fill="var(--svg-label)" />
               </marker>
             </defs>
           </svg>
@@ -276,33 +276,33 @@ export default function MLP() {
             <div className="text-amber-400 text-[10px] font-semibold">EXPAND</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
           </svg>
           <div className="bg-violet-500/20 border border-violet-400/40 rounded-lg px-3 py-2 text-center">
             <div className="text-violet-400 font-mono text-sm font-bold">64-dim</div>
             <div className="text-slate-500 text-[10px]">hidden</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
           </svg>
           <div className="bg-emerald-500/20 border border-emerald-400/40 rounded px-2 py-1.5">
             <div className="text-emerald-400 text-[10px] font-semibold">ReLU</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
           </svg>
           <div className="bg-violet-500/20 border border-violet-400/40 rounded-lg px-3 py-2 text-center">
             <div className="text-violet-400 font-mono text-sm font-bold">64-dim</div>
             <div className="text-slate-500 text-[10px]">activated</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
           </svg>
           <div className="bg-rose-500/20 border border-rose-400/40 rounded px-2 py-1.5">
             <div className="text-rose-400 text-[10px] font-semibold">SHRINK</div>
           </div>
           <svg width="30" height="20" viewBox="0 0 30 20">
-            <path d="M2 10 L22 10" stroke="#64748b" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
+            <path d="M2 10 L22 10" stroke="var(--svg-label)" strokeWidth={1.5} markerEnd="url(#arrMlp)" />
           </svg>
           <div className="bg-blue-500/20 border border-blue-400/40 rounded-lg px-3 py-2 text-center">
             <div className="text-blue-400 font-mono text-sm font-bold">16-dim</div>

@@ -34,7 +34,7 @@ const colorMap: Record<string, { bg: string; border: string; text: string; fill:
 };
 
 export default function StateDict() {
-  const [hoveredMatrix, setHoveredMatrix] = useState<number | null>(null);
+  const [hoveredMatrix, setHoveredMatrix] = useState<number>(0);
 
   const leftContent = (
     <div className="space-y-6">
@@ -86,38 +86,35 @@ export default function StateDict() {
                   className={`relative transition-all duration-200 cursor-pointer ${colors.fill} ${
                     isHovered ? 'brightness-125 z-10' : 'brightness-75'
                   }`}
-                  style={{ width: `${pct}%`, opacity: hoveredMatrix !== null && !isHovered ? 0.4 : 0.85 }}
+                  style={{ width: `${pct}%`, opacity: !isHovered ? 0.4 : 0.85 }}
                   onMouseEnter={() => setHoveredMatrix(i)}
-                  onMouseLeave={() => setHoveredMatrix(null)}
                 />
               );
             })}
           </div>
 
-          {/* Hover tooltip */}
-          {hoveredMatrix !== null && (
-            <div className="mt-3 p-3 rounded-lg bg-slate-900/90 border border-slate-600/40 text-sm animate-fade-in">
-              <div className="flex items-center justify-between mb-1">
-                <span className={`font-semibold font-mono text-xs ${colorMap[PARAM_MATRICES[hoveredMatrix].color].text}`}>
-                  {PARAM_MATRICES[hoveredMatrix].name}
-                </span>
-                <span className="text-slate-400 text-xs">
-                  {PARAM_MATRICES[hoveredMatrix].label}
-                </span>
-              </div>
-              <div className="text-xs text-slate-400">
-                Dimensions:{' '}
-                <span className="text-slate-200 font-mono">
-                  {PARAM_MATRICES[hoveredMatrix].rows} x {PARAM_MATRICES[hoveredMatrix].cols}
-                </span>
-                {' = '}
-                <span className="text-amber-400 font-mono font-semibold">
-                  {(PARAM_MATRICES[hoveredMatrix].rows * PARAM_MATRICES[hoveredMatrix].cols).toLocaleString()}
-                </span>
-                {' params'}
-              </div>
+          {/* Detail box — always visible */}
+          <div className="mt-3 p-3 rounded-lg bg-slate-900/90 border border-slate-600/40 text-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className={`font-semibold font-mono text-xs ${colorMap[PARAM_MATRICES[hoveredMatrix].color].text}`}>
+                {PARAM_MATRICES[hoveredMatrix].name}
+              </span>
+              <span className="text-slate-400 text-xs">
+                {PARAM_MATRICES[hoveredMatrix].label}
+              </span>
             </div>
-          )}
+            <div className="text-xs text-slate-400">
+              Dimensions:{' '}
+              <span className="text-slate-200 font-mono">
+                {PARAM_MATRICES[hoveredMatrix].rows} x {PARAM_MATRICES[hoveredMatrix].cols}
+              </span>
+              {' = '}
+              <span className="text-amber-400 font-mono font-semibold">
+                {(PARAM_MATRICES[hoveredMatrix].rows * PARAM_MATRICES[hoveredMatrix].cols).toLocaleString()}
+              </span>
+              {' params'}
+            </div>
+          </div>
         </div>
 
         {/* Legend */}
@@ -134,7 +131,6 @@ export default function StateDict() {
                     : 'bg-slate-800/30 border-transparent hover:border-slate-600/30'
                 }`}
                 onMouseEnter={() => setHoveredMatrix(i)}
-                onMouseLeave={() => setHoveredMatrix(null)}
               >
                 <div className={`w-2.5 h-2.5 rounded-sm flex-shrink-0 ${colors.fill}`} style={{ opacity: 0.85 }} />
                 <span className="font-mono text-slate-400 truncate">{mat.name}</span>

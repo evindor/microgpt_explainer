@@ -1,225 +1,24 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, type CSSProperties } from 'react';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import { getCodeStyle } from '../theme/codeStyles';
+import { useTheme } from '../theme/ThemeContext';
 import pySource from '../../microgpt/microgpt.py?raw';
 import jsSource from '../../microgpt/microgpt.js?raw';
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function highlightPython(code: string): string {
-  const keywords = [
-    'import', 'from', 'def', 'class', 'return', 'if', 'else', 'elif',
-    'for', 'in', 'while', 'not', 'and', 'or', 'is', 'None', 'True', 'False',
-    'with', 'as', 'try', 'except', 'finally', 'raise', 'yield', 'lambda',
-    'pass', 'break', 'continue', 'global', 'nonlocal', 'assert', 'del',
-  ];
-  const builtins = [
-    'print', 'len', 'range', 'sum', 'max', 'min', 'abs', 'int', 'float',
-    'str', 'list', 'dict', 'set', 'tuple', 'sorted', 'enumerate', 'zip',
-    'map', 'filter', 'isinstance', 'type', 'open', 'super', 'property',
-    'staticmethod', 'classmethod', 'reversed', 'any', 'all',
-  ];
-
-  let result = '';
-  let inTripleQuote: string | null = null;
-  const lines = code.split('\n');
-
-  for (const line of lines) {
-    let i = 0;
-
-    if (inTripleQuote) {
-      const end = line.indexOf(inTripleQuote);
-      if (end !== -1) {
-        result += `<span class="chs">${escapeHtml(line.slice(0, end + 3))}</span>`;
-        inTripleQuote = null;
-        i = end + 3;
-      } else {
-        result += `<span class="chs">${escapeHtml(line)}</span>\n`;
-        continue;
-      }
-    }
-
-    while (i < line.length) {
-      if (line[i] === '#') {
-        result += `<span class="chc">${escapeHtml(line.slice(i))}</span>`;
-        i = line.length;
-        continue;
-      }
-      if (line[i] === "'" || line[i] === '"') {
-        const quote = line[i];
-        const tripleQuote = line.slice(i, i + 3);
-        if (tripleQuote === '"""' || tripleQuote === "'''") {
-          const end = line.indexOf(tripleQuote, i + 3);
-          if (end !== -1) {
-            result += `<span class="chs">${escapeHtml(line.slice(i, end + 3))}</span>`;
-            i = end + 3;
-          } else {
-            result += `<span class="chs">${escapeHtml(line.slice(i))}</span>`;
-            inTripleQuote = tripleQuote;
-            i = line.length;
-          }
-        } else {
-          let j = i + 1;
-          while (j < line.length && line[j] !== quote) {
-            if (line[j] === '\\') j++;
-            j++;
-          }
-          result += `<span class="chs">${escapeHtml(line.slice(i, j + 1))}</span>`;
-          i = j + 1;
-        }
-        continue;
-      }
-      if (/\d/.test(line[i]) && (i === 0 || /[\s(,=+\-*/<>[\]:]/.test(line[i - 1]))) {
-        let j = i;
-        while (j < line.length && /[\d.e_xXabcdefABCDEF+-]/.test(line[j])) j++;
-        result += `<span class="chn">${escapeHtml(line.slice(i, j))}</span>`;
-        i = j;
-        continue;
-      }
-      if (line[i] === '@') {
-        let j = i + 1;
-        while (j < line.length && /\w/.test(line[j])) j++;
-        result += `<span class="chd">${escapeHtml(line.slice(i, j))}</span>`;
-        i = j;
-        continue;
-      }
-      if (/[a-zA-Z_]/.test(line[i])) {
-        let j = i;
-        while (j < line.length && /\w/.test(line[j])) j++;
-        const word = line.slice(i, j);
-        if (keywords.includes(word)) {
-          result += `<span class="chk">${word}</span>`;
-        } else if (builtins.includes(word)) {
-          result += `<span class="chb">${word}</span>`;
-        } else if (j < line.length && line[j] === '(') {
-          result += `<span class="chf">${word}</span>`;
-        } else if (word === 'self') {
-          result += `<span class="chk">${word}</span>`;
-        } else {
-          result += escapeHtml(word);
-        }
-        i = j;
-        continue;
-      }
-      if ('+-*/%=<>!&|^~'.includes(line[i])) {
-        result += `<span class="cho">${escapeHtml(line[i])}</span>`;
-        i++;
-        continue;
-      }
-      result += escapeHtml(line[i]);
-      i++;
-    }
-    result += '\n';
-  }
-  return result;
-}
-
-function highlightJavaScript(code: string): string {
-  const keywords = [
-    'const', 'let', 'var', 'function', 'class', 'return', 'if', 'else',
-    'for', 'while', 'do', 'new', 'of', 'in', 'import', 'from', 'export',
-    'throw', 'typeof', 'instanceof', 'this', 'break', 'continue',
-    'switch', 'case', 'default', 'try', 'catch', 'finally',
-    'void', 'delete', 'yield', 'async', 'await', 'extends', 'static',
-    'true', 'false', 'null', 'undefined',
-  ];
-  const builtins = [
-    'console', 'Math', 'Array', 'Object', 'Set', 'String', 'Number',
-    'process', 'Error', 'Map', 'Promise', 'Symbol', 'JSON', 'Date',
-    'parseInt', 'parseFloat', 'Infinity', 'NaN', 'readFileSync', 'existsSync',
-  ];
-
-  let result = '';
-  let inBlockComment = false;
-  const lines = code.split('\n');
-
-  for (const line of lines) {
-    let i = 0;
-
-    if (inBlockComment) {
-      const end = line.indexOf('*/');
-      if (end !== -1) {
-        result += `<span class="chc">${escapeHtml(line.slice(0, end + 2))}</span>`;
-        inBlockComment = false;
-        i = end + 2;
-      } else {
-        result += `<span class="chc">${escapeHtml(line)}</span>\n`;
-        continue;
-      }
-    }
-
-    while (i < line.length) {
-      if (line[i] === '/' && line[i + 1] === '/') {
-        result += `<span class="chc">${escapeHtml(line.slice(i))}</span>`;
-        i = line.length;
-        continue;
-      }
-      if (line[i] === '/' && line[i + 1] === '*') {
-        const end = line.indexOf('*/', i + 2);
-        if (end !== -1) {
-          result += `<span class="chc">${escapeHtml(line.slice(i, end + 2))}</span>`;
-          i = end + 2;
-        } else {
-          result += `<span class="chc">${escapeHtml(line.slice(i))}</span>`;
-          inBlockComment = true;
-          i = line.length;
-        }
-        continue;
-      }
-      if (line[i] === "'" || line[i] === '"' || line[i] === '`') {
-        const quote = line[i];
-        let j = i + 1;
-        while (j < line.length && line[j] !== quote) {
-          if (line[j] === '\\') j++;
-          j++;
-        }
-        result += `<span class="chs">${escapeHtml(line.slice(i, j + 1))}</span>`;
-        i = j + 1;
-        continue;
-      }
-      if (/\d/.test(line[i]) && (i === 0 || /[\s(,=+\-*/<>[\]:!&|^~?;{}]/.test(line[i - 1]))) {
-        let j = i;
-        while (j < line.length && /[\d.e_xXabcdefABCDEF+-n]/.test(line[j])) j++;
-        result += `<span class="chn">${escapeHtml(line.slice(i, j))}</span>`;
-        i = j;
-        continue;
-      }
-      if (/[a-zA-Z_$]/.test(line[i])) {
-        let j = i;
-        while (j < line.length && /[\w$]/.test(line[j])) j++;
-        const word = line.slice(i, j);
-        if (keywords.includes(word)) {
-          result += `<span class="chk">${word}</span>`;
-        } else if (builtins.includes(word)) {
-          result += `<span class="chb">${word}</span>`;
-        } else if (j < line.length && line[j] === '(') {
-          result += `<span class="chf">${word}</span>`;
-        } else {
-          result += escapeHtml(word);
-        }
-        i = j;
-        continue;
-      }
-      if ('+-*/%=<>!&|^~?'.includes(line[i])) {
-        result += `<span class="cho">${escapeHtml(line[i])}</span>`;
-        i++;
-        continue;
-      }
-      result += escapeHtml(line[i]);
-      i++;
-    }
-    result += '\n';
-  }
-  return result;
-}
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('javascript', javascript);
 
 type Lang = 'py' | 'js';
 type LineRange = [number, number]; // inclusive [start, end]
 
-function expandRanges(ranges: LineRange[]): number[] {
-  return ranges.flatMap(([start, end]) =>
-    Array.from({ length: end - start + 1 }, (_, i) => start + i)
-  );
+function expandRanges(ranges: LineRange[]): Set<number> {
+  const set = new Set<number>();
+  for (const [start, end] of ranges) {
+    for (let i = start; i <= end; i++) set.add(i);
+  }
+  return set;
 }
 
 const STORAGE_KEY = 'microgpt-code-lang';
@@ -232,6 +31,7 @@ interface CodePanelProps {
 }
 
 export default function CodePanel({ pyHighlight = [], jsHighlight = [], title, blogExcerpt }: CodePanelProps) {
+  const { theme } = useTheme();
   const [lang, setLang] = useState<Lang>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored === 'js' ? 'js' : 'py';
@@ -239,17 +39,15 @@ export default function CodePanel({ pyHighlight = [], jsHighlight = [], title, b
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const pyHighlighted = useMemo(() => highlightPython(pySource), []);
-  const jsHighlighted = useMemo(() => highlightJavaScript(jsSource), []);
+  const source = lang === 'py' ? pySource : jsSource;
+  const language = lang === 'py' ? 'python' : 'javascript';
 
-  const pyLines = useMemo(() => pyHighlighted.split('\n'), [pyHighlighted]);
-  const jsLines = useMemo(() => jsHighlighted.split('\n'), [jsHighlighted]);
-
-  const lines = lang === 'py' ? pyLines : jsLines;
   const highlightLines = useMemo(
     () => expandRanges(lang === 'py' ? pyHighlight : jsHighlight),
     [lang, pyHighlight, jsHighlight]
   );
+
+  const codeStyle = useMemo(() => getCodeStyle(theme), [theme]);
 
   const setLanguage = useCallback((newLang: Lang) => {
     setLang(newLang);
@@ -258,9 +56,9 @@ export default function CodePanel({ pyHighlight = [], jsHighlight = [], title, b
 
   // Auto-scroll to first highlighted line
   useEffect(() => {
-    if (!scrollRef.current || !highlightLines.length) return;
+    if (!scrollRef.current || !highlightLines.size) return;
     const firstLine = Math.min(...highlightLines);
-    const lineEl = scrollRef.current.querySelector(`[data-line="${firstLine}"]`);
+    const lineEl = scrollRef.current.querySelector(`[data-line-number="${firstLine}"]`);
     if (lineEl) {
       requestAnimationFrame(() => {
         lineEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -268,8 +66,27 @@ export default function CodePanel({ pyHighlight = [], jsHighlight = [], title, b
     }
   }, [highlightLines, lang]);
 
+  const lineProps = useCallback(
+    (lineNumber: number): { style: CSSProperties; 'data-line-number': number } => {
+      const isHighlighted = highlightLines.has(lineNumber);
+      return {
+        style: {
+          display: 'block',
+          backgroundColor: isHighlighted ? 'var(--highlight-line-bg)' : undefined,
+          borderLeft: isHighlighted ? '2px solid var(--highlight-line-border)' : '2px solid transparent',
+          marginLeft: '-16px',
+          marginRight: '-16px',
+          paddingLeft: '14px',
+          paddingRight: '16px',
+        },
+        'data-line-number': lineNumber,
+      };
+    },
+    [highlightLines]
+  );
+
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--code-bg)' }}>
       {/* Header: title + language toggle */}
       <div className="px-4 py-2.5 border-b border-slate-700/50 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2 min-w-0">
@@ -317,34 +134,37 @@ export default function CodePanel({ pyHighlight = [], jsHighlight = [], title, b
       )}
 
       <div ref={scrollRef} className="flex-1 overflow-auto">
-        <pre className="p-4 text-[13px] leading-[1.7] font-mono">
-          <code>
-            {lines.map((line, i) => (
-              <div
-                key={i}
-                data-line={i + 1}
-                className={`flex ${highlightLines.includes(i + 1) ? 'bg-amber-400/10 -mx-4 px-4 border-l-2 border-amber-400' : ''}`}
-              >
-                <span className="inline-block w-8 text-right mr-4 text-slate-600 select-none flex-shrink-0 text-xs leading-[1.85]">
-                  {i + 1}
-                </span>
-                <span dangerouslySetInnerHTML={{ __html: line }} />
-              </div>
-            ))}
-          </code>
-        </pre>
+        <SyntaxHighlighter
+          language={language}
+          style={codeStyle}
+          showLineNumbers
+          wrapLines
+          lineProps={lineProps}
+          lineNumberStyle={{
+            minWidth: '2.5em',
+            textAlign: 'right',
+            marginRight: '1em',
+            color: 'var(--shell-text-dim)',
+            userSelect: 'none',
+            fontSize: '12px',
+          }}
+          customStyle={{
+            margin: 0,
+            padding: '16px',
+            background: 'transparent',
+            fontSize: '13px',
+            lineHeight: '1.7',
+            fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+          }}
+          codeTagProps={{
+            style: {
+              fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
+            },
+          }}
+        >
+          {source}
+        </SyntaxHighlighter>
       </div>
-
-      <style>{`
-        .chk { color: #c084fc; font-weight: 500; }
-        .chs { color: #34d399; }
-        .chc { color: #64748b; font-style: italic; }
-        .chn { color: #fbbf24; }
-        .chf { color: #60a5fa; }
-        .chd { color: #f472b6; }
-        .chb { color: #22d3ee; }
-        .cho { color: #94a3b8; }
-      `}</style>
     </div>
   );
 }

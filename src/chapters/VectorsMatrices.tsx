@@ -5,13 +5,15 @@ import CodePanel from '../components/CodePanel';
 function valueToBg(v: number): string {
   if (v > 0) {
     const intensity = Math.min(v / 2, 1);
-    return `rgba(34, 197, 94, ${0.15 + intensity * 0.45})`;
+    const pct = Math.round((0.15 + intensity * 0.45) * 100);
+    return `color-mix(in srgb, var(--accent-emerald) ${pct}%, transparent)`;
   }
   if (v < 0) {
     const intensity = Math.min(Math.abs(v) / 2, 1);
-    return `rgba(59, 130, 246, ${0.15 + intensity * 0.45})`;
+    const pct = Math.round((0.15 + intensity * 0.45) * 100);
+    return `color-mix(in srgb, var(--accent-blue) ${pct}%, transparent)`;
   }
-  return 'rgba(148, 163, 184, 0.1)';
+  return 'color-mix(in srgb, var(--svg-muted) 10%, transparent)';
 }
 
 function valueToBorder(v: number): string {
@@ -97,15 +99,15 @@ export default function VectorsMatrices() {
           </div>
           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'rgba(59, 130, 246, 0.5)' }} />
+              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-blue) 50%, transparent)' }} />
               Negative
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'rgba(148, 163, 184, 0.15)' }} />
+              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'color-mix(in srgb, var(--svg-muted) 15%, transparent)' }} />
               Zero
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'rgba(34, 197, 94, 0.5)' }} />
+              <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-emerald) 50%, transparent)' }} />
               Positive
             </span>
           </div>
@@ -180,7 +182,7 @@ export default function VectorsMatrices() {
                     className="px-2 py-1 rounded border transition-all"
                     style={{
                       backgroundColor: valueToBg(p),
-                      borderColor: p >= 0 ? 'rgba(34, 197, 94, 0.3)' : 'rgba(59, 130, 246, 0.3)',
+                      borderColor: p >= 0 ? 'color-mix(in srgb, var(--accent-emerald) 30%, transparent)' : 'color-mix(in srgb, var(--accent-blue) 30%, transparent)',
                     }}
                   >
                     <span className="text-purple-300">{vecA[i].toFixed(1)}</span>

@@ -1,13 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
 import CodePanel from '../components/CodePanel';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-/** Generate fake training loss data */
-const lossData = Array.from({ length: 100 }, (_, i) => ({
-  step: i * 10,
-  loss: 3.3 * Math.exp(-i * 0.015) + 2.37 * (1 - Math.exp(-i * 0.015)) + (Math.random() - 0.5) * 0.1,
-}));
+import TrainingDashboard from '../components/TrainingDashboard';
 
 const PIPELINE_STEPS = [
   { num: 1, title: 'Pick a name', detail: 'e.g., "emma"', sub: 'BOS, e, m, m, a, BOS', color: 'violet' },
@@ -280,8 +274,8 @@ export default function Training() {
           </h3>
           <svg viewBox="0 0 540 230" className="w-full max-w-[500px]" style={{ height: 200 }}>
             {/* Grid */}
-            <line x1="40" y1="10" x2="40" y2="200" stroke="#334155" strokeWidth="1" />
-            <line x1="40" y1="200" x2="520" y2="200" stroke="#334155" strokeWidth="1" />
+            <line x1="40" y1="10" x2="40" y2="200" stroke="var(--svg-grid)" strokeWidth="1" />
+            <line x1="40" y1="200" x2="520" y2="200" stroke="var(--svg-grid)" strokeWidth="1" />
             {/* Grid lines */}
             {[0.2, 0.4, 0.6, 0.8, 1.0].map((v) => (
               <g key={v}>
@@ -290,11 +284,11 @@ export default function Training() {
                   y1="10"
                   x2={40 + v * 480}
                   y2="200"
-                  stroke="#1e293b"
+                  stroke="var(--svg-grid-light)"
                   strokeWidth="0.5"
                   strokeDasharray="3 3"
                 />
-                <text x={40 + v * 480} y="215" fill="#64748b" fontSize="9" textAnchor="middle">
+                <text x={40 + v * 480} y="215" fill="var(--svg-label)" fontSize="9" textAnchor="middle">
                   {v.toFixed(1)}
                 </text>
               </g>
@@ -306,27 +300,27 @@ export default function Training() {
                   y1={200 - (v / 5) * 180}
                   x2="520"
                   y2={200 - (v / 5) * 180}
-                  stroke="#1e293b"
+                  stroke="var(--svg-grid-light)"
                   strokeWidth="0.5"
                   strokeDasharray="3 3"
                 />
-                <text x="32" y={200 - (v / 5) * 180 + 3} fill="#64748b" fontSize="9" textAnchor="end">
+                <text x="32" y={200 - (v / 5) * 180 + 3} fill="var(--svg-label)" fontSize="9" textAnchor="end">
                   {v}
                 </text>
               </g>
             ))}
             {/* Axis labels */}
-            <text x="280" y="228" fill="#94a3b8" fontSize="10" textAnchor="middle">
+            <text x="280" y="228" fill="var(--svg-muted)" fontSize="10" textAnchor="middle">
               Probability
             </text>
-            <text x="12" y="110" fill="#94a3b8" fontSize="10" textAnchor="middle" transform="rotate(-90, 12, 110)">
+            <text x="12" y="110" fill="var(--svg-muted)" fontSize="10" textAnchor="middle" transform="rotate(-90, 12, 110)">
               Loss
             </text>
             {/* Curve */}
             <path
               d={curvePath}
               fill="none"
-              stroke="#22d3ee"
+              stroke="var(--accent-cyan)"
               strokeWidth="2"
               transform="translate(40, 0)"
               opacity="0.8"
@@ -336,8 +330,8 @@ export default function Training() {
               cx={40 + pCorrect * 480}
               cy={Math.max(10, 200 - (lossValue / 5) * 180)}
               r="5"
-              fill="#fbbf24"
-              stroke="#1e293b"
+              fill="var(--accent-amber)"
+              stroke="var(--svg-grid-light)"
               strokeWidth="2"
             />
             {/* Dashed lines to axes */}
@@ -346,7 +340,7 @@ export default function Training() {
               y1={Math.max(10, 200 - (lossValue / 5) * 180)}
               x2={40 + pCorrect * 480}
               y2="200"
-              stroke="#fbbf24"
+              stroke="var(--accent-amber)"
               strokeWidth="1"
               strokeDasharray="3 3"
               opacity="0.5"
@@ -356,7 +350,7 @@ export default function Training() {
               y1={Math.max(10, 200 - (lossValue / 5) * 180)}
               x2={40 + pCorrect * 480}
               y2={Math.max(10, 200 - (lossValue / 5) * 180)}
-              stroke="#fbbf24"
+              stroke="var(--accent-amber)"
               strokeWidth="1"
               strokeDasharray="3 3"
               opacity="0.5"
@@ -365,14 +359,14 @@ export default function Training() {
         </div>
       </div>
 
-      {/* Training Loss Curve (Recharts) */}
+      {/* Live Training */}
       <div className="viz-card glow-cyan">
         <h2 className="text-sm font-semibold text-cyan-400 uppercase tracking-wider mb-3">
-          Training Loss Curve
+          Live Training
         </h2>
         <p className="text-sm text-slate-300 leading-relaxed mb-4">
-          Over 1000 training steps, the loss decreases from random guessing to a model that
-          predicts plausible next characters.
+          Train the 4,192-parameter model right here in your browser. Watch the loss decrease
+          from random guessing (~3.3) to a model that predicts plausible next characters.
         </p>
 
         {/* Random baseline derivation */}
@@ -396,53 +390,7 @@ export default function Training() {
           </p>
         </div>
 
-        <div className="bg-slate-900/60 rounded-lg p-4 relative">
-          {/* Annotations */}
-          <div className="absolute top-6 left-16 text-[10px] text-slate-400 bg-slate-800/80 px-2 py-1 rounded border border-slate-700/50 z-10">
-            Random guessing: ~3.3
-          </div>
-          <div className="absolute bottom-10 right-8 text-[10px] text-slate-400 bg-slate-800/80 px-2 py-1 rounded border border-slate-700/50 z-10">
-            After training: ~2.37
-          </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={lossData} margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis
-                dataKey="step"
-                stroke="#64748b"
-                fontSize={10}
-                tickLine={false}
-                label={{ value: 'Step', position: 'insideBottomRight', offset: -5, fill: '#64748b', fontSize: 10 }}
-              />
-              <YAxis
-                stroke="#64748b"
-                fontSize={10}
-                tickLine={false}
-                domain={[2.0, 3.6]}
-                label={{ value: 'Loss', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 10 }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#0f172a',
-                  border: '1px solid #334155',
-                  borderRadius: '8px',
-                  fontSize: '11px',
-                  color: '#e2e8f0',
-                }}
-                labelFormatter={(val) => `Step ${val}`}
-                formatter={(val: number | undefined) => [(val ?? 0).toFixed(3), 'Loss']}
-              />
-              <Line
-                type="monotone"
-                dataKey="loss"
-                stroke="#22d3ee"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: '#22d3ee', stroke: '#0f172a', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <TrainingDashboard />
       </div>
 
       {/* Adam Optimizer */}
@@ -556,11 +504,11 @@ export default function Training() {
           <h3 className="text-xs text-slate-500 mb-2 font-medium">Loss landscape (ball rolling to minimum)</h3>
           <svg viewBox="0 0 500 210" className="w-full" style={{ height: 160 }}>
             {/* Axes */}
-            <line x1="40" y1="190" x2="460" y2="190" stroke="#334155" strokeWidth="1" />
-            <text x="250" y="207" fill="#64748b" fontSize="9" textAnchor="middle">Parameters</text>
-            <text x="18" y="100" fill="#64748b" fontSize="9" textAnchor="middle" transform="rotate(-90, 18, 100)">Loss</text>
+            <line x1="40" y1="190" x2="460" y2="190" stroke="var(--svg-grid)" strokeWidth="1" />
+            <text x="250" y="207" fill="var(--svg-label)" fontSize="9" textAnchor="middle">Parameters</text>
+            <text x="18" y="100" fill="var(--svg-label)" fontSize="9" textAnchor="middle" transform="rotate(-90, 18, 100)">Loss</text>
             {/* Parabola */}
-            <path d={parabolaPath} fill="none" stroke="#34d399" strokeWidth="2" opacity="0.6" />
+            <path d={parabolaPath} fill="none" stroke="var(--accent-emerald)" strokeWidth="2" opacity="0.6" />
             {/* Shaded area under curve */}
             <path
               d={`${parabolaPath} L450,190 L50,190 Z`}
@@ -569,20 +517,20 @@ export default function Training() {
             />
             <defs>
               <linearGradient id="lossGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#34d399" />
-                <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--accent-emerald)" />
+                <stop offset="100%" stopColor="var(--accent-emerald)" stopOpacity="0" />
               </linearGradient>
             </defs>
             {/* Minimum marker */}
-            <line x1={50 + 0.8 * 400} y1="40" x2={50 + 0.8 * 400} y2="190" stroke="#334155" strokeWidth="0.5" strokeDasharray="4 4" />
-            <text x={50 + 0.8 * 400} y="35" fill="#64748b" fontSize="8" textAnchor="middle">minimum</text>
+            <line x1={50 + 0.8 * 400} y1="40" x2={50 + 0.8 * 400} y2="190" stroke="var(--svg-grid)" strokeWidth="0.5" strokeDasharray="4 4" />
+            <text x={50 + 0.8 * 400} y="35" fill="var(--svg-label)" fontSize="8" textAnchor="middle">minimum</text>
             {/* Animated ball */}
             <circle
               cx={ballX}
               cy={ballY}
               r="6"
-              fill="#fbbf24"
-              stroke="#1e293b"
+              fill="var(--accent-amber)"
+              stroke="var(--svg-grid-light)"
               strokeWidth="2"
             >
               <animate attributeName="opacity" values="1;0.8;1" dur="1s" repeatCount="indefinite" />
@@ -598,7 +546,7 @@ export default function Training() {
                   cx={tx}
                   cy={ty}
                   r="2"
-                  fill="#fbbf24"
+                  fill="var(--accent-amber)"
                   opacity={0.2 + idx * 0.1}
                 />
               );

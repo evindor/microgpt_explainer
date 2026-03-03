@@ -116,38 +116,38 @@ export default function Autograd() {
           {/* glow */}
           {forwardGlow && (
             <rect x={node.x - w / 2 - 4} y={node.y - h / 2 - 4} width={w + 8} height={h + 8} rx={14}
-              fill="none" stroke="#22d3ee" strokeWidth={2} opacity={0.6}>
+              fill="none" stroke="var(--node-glow-forward)" strokeWidth={2} opacity={0.6}>
               <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
             </rect>
           )}
           {backwardGlow && (
             <rect x={node.x - w / 2 - 4} y={node.y - h / 2 - 4} width={w + 8} height={h + 8} rx={14}
-              fill="none" stroke="#fb7185" strokeWidth={2} opacity={0.6}>
+              fill="none" stroke="var(--node-glow-backward)" strokeWidth={2} opacity={0.6}>
               <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
             </rect>
           )}
           <rect
             x={node.x - w / 2} y={node.y - h / 2} width={w} height={h} rx={12}
-            fill={forwardGlow ? '#164e63' : backwardGlow ? '#4c1d2e' : '#1e293b'}
-            stroke={forwardGlow ? '#22d3ee' : backwardGlow ? '#fb7185' : '#475569'}
+            fill={forwardGlow ? 'var(--node-glow-forward-bg)' : backwardGlow ? 'var(--node-glow-backward-bg)' : 'var(--node-bg)'}
+            stroke={forwardGlow ? 'var(--node-glow-forward)' : backwardGlow ? 'var(--node-glow-backward)' : 'var(--node-stroke)'}
             strokeWidth={1.5}
             style={{ transition: 'fill 0.3s, stroke 0.3s' }}
           />
           <text x={node.x} y={node.y + 1} textAnchor="middle" dominantBaseline="central"
-            fill={forwardGlow ? '#22d3ee' : backwardGlow ? '#fb7185' : '#94a3b8'}
+            fill={forwardGlow ? 'var(--node-glow-forward)' : backwardGlow ? 'var(--node-glow-backward)' : 'var(--svg-muted)'}
             fontSize={16} fontWeight={700} fontFamily="monospace">
             {node.label}
           </text>
           {/* value label below op node */}
           {val && (
-            <text x={node.x} y={node.y + h / 2 + 14} textAnchor="middle" fill="#67e8f9" fontSize={11}
+            <text x={node.x} y={node.y + h / 2 + 14} textAnchor="middle" fill="var(--node-value)" fontSize={11}
               fontFamily="monospace" fontWeight={600} style={{ transition: 'opacity 0.3s' }}>
               = {val}
             </text>
           )}
           {/* gradient label above op node */}
           {hasGrad && (
-            <text x={node.x} y={node.y - h / 2 - 8} textAnchor="middle" fill="#fb923c" fontSize={11}
+            <text x={node.x} y={node.y - h / 2 - 8} textAnchor="middle" fill="var(--node-grad)" fontSize={11}
               fontWeight={700} fontFamily="monospace">
               grad={grads[key]}
             </text>
@@ -162,32 +162,32 @@ export default function Autograd() {
       <g key={key} style={{ transition: 'opacity 0.4s', opacity: isVisible ? 1 : 0.15 }}>
         {/* glow */}
         {forwardGlow && (
-          <circle cx={node.x} cy={node.y} r={r + 5} fill="none" stroke="#22d3ee" strokeWidth={2} opacity={0.6}>
+          <circle cx={node.x} cy={node.y} r={r + 5} fill="none" stroke="var(--node-glow-forward)" strokeWidth={2} opacity={0.6}>
             <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
           </circle>
         )}
         {backwardGlow && (
-          <circle cx={node.x} cy={node.y} r={r + 5} fill="none" stroke="#fb7185" strokeWidth={2} opacity={0.6}>
+          <circle cx={node.x} cy={node.y} r={r + 5} fill="none" stroke="var(--node-glow-backward)" strokeWidth={2} opacity={0.6}>
             <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
           </circle>
         )}
         <circle
           cx={node.x} cy={node.y} r={r}
-          fill={forwardGlow ? '#164e63' : backwardGlow ? '#4c1d2e' : '#0f172a'}
-          stroke={forwardGlow ? '#22d3ee' : backwardGlow ? '#fb7185' : '#475569'}
+          fill={forwardGlow ? 'var(--node-glow-forward-bg)' : backwardGlow ? 'var(--node-glow-backward-bg)' : 'var(--node-bg-deep)'}
+          stroke={forwardGlow ? 'var(--node-glow-forward)' : backwardGlow ? 'var(--node-glow-backward)' : 'var(--node-stroke)'}
           strokeWidth={1.5}
           style={{ transition: 'fill 0.3s, stroke 0.3s' }}
         />
         {/* label */}
         <text x={node.x} y={node.y - 6} textAnchor="middle" dominantBaseline="central"
-          fill={forwardGlow ? '#a5f3fc' : backwardGlow ? '#fda4af' : '#cbd5e1'}
+          fill={forwardGlow ? 'var(--node-label-forward)' : backwardGlow ? 'var(--node-label-backward)' : 'var(--node-label)'}
           fontSize={13} fontWeight={700} fontFamily="monospace">
           {node.label}
         </text>
         {/* value inside */}
         {val && (
           <text x={node.x} y={node.y + 12} textAnchor="middle" dominantBaseline="central"
-            fill={forwardGlow ? '#22d3ee' : backwardGlow ? '#fb7185' : '#64748b'}
+            fill={forwardGlow ? 'var(--node-glow-forward)' : backwardGlow ? 'var(--node-glow-backward)' : 'var(--svg-label)'}
             fontSize={12} fontFamily="monospace" fontWeight={600}>
             {val}
           </text>
@@ -196,8 +196,8 @@ export default function Autograd() {
         {hasGrad && (
           <g>
             <rect x={node.x - 28} y={node.y + r + 4} width={56} height={18} rx={4}
-              fill="#7c2d12" opacity={0.8} />
-            <text x={node.x} y={node.y + r + 15} textAnchor="middle" fill="#fb923c" fontSize={10}
+              fill="var(--node-grad-bg)" opacity={0.8} />
+            <text x={node.x} y={node.y + r + 15} textAnchor="middle" fill="var(--node-grad)" fontSize={10}
               fontWeight={700} fontFamily="monospace">
               grad={grads[key]}
             </text>
@@ -236,7 +236,7 @@ export default function Autograd() {
       <g key={idx} style={{ transition: 'opacity 0.4s', opacity: bothVisible ? 1 : 0.1 }}>
         <line
           x1={x1} y1={y1} x2={x2} y2={y2}
-          stroke={isForward ? '#22d3ee' : isBackward ? '#fb7185' : '#334155'}
+          stroke={isForward ? 'var(--node-glow-forward)' : isBackward ? 'var(--node-glow-backward)' : 'var(--svg-grid)'}
           strokeWidth={isLit ? 2.5 : 1.5}
           markerEnd={isForward ? 'url(#arrowCyan)' : isBackward ? 'url(#arrowRose)' : 'url(#arrowGray)'}
           style={{ transition: 'stroke 0.3s, stroke-width 0.3s' }}
@@ -350,24 +350,24 @@ export default function Autograd() {
         <svg viewBox="0 0 680 420" width="100%" className="select-none" style={{ maxHeight: 420 }}>
           <defs>
             <marker id="arrowCyan" viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--node-glow-forward)" />
             </marker>
             <marker id="arrowRose" viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#fb7185" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--node-glow-backward)" />
             </marker>
             <marker id="arrowGray" viewBox="0 0 10 10" refX={9} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--node-stroke)" />
             </marker>
             {/* Glow filters */}
             <filter id="glowCyan" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="4" result="blur" />
-              <feFlood floodColor="#22d3ee" floodOpacity="0.4" />
+              <feFlood floodColor="var(--node-glow-forward)" floodOpacity="0.4" />
               <feComposite in2="blur" operator="in" />
               <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
             <filter id="glowRose" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="4" result="blur" />
-              <feFlood floodColor="#fb7185" floodOpacity="0.4" />
+              <feFlood floodColor="var(--node-glow-backward)" floodOpacity="0.4" />
               <feComposite in2="blur" operator="in" />
               <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
@@ -376,7 +376,7 @@ export default function Autograd() {
           {/* Background grid dots */}
           {Array.from({ length: 17 }).map((_, col) =>
             Array.from({ length: 11 }).map((_, row) => (
-              <circle key={`${col}-${row}`} cx={col * 42 + 8} cy={row * 40 + 10} r={0.8} fill="#334155" opacity={0.4} />
+              <circle key={`${col}-${row}`} cx={col * 42 + 8} cy={row * 40 + 10} r={0.8} fill="var(--svg-grid)" opacity={0.4} />
             ))
           )}
 

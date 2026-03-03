@@ -1,6 +1,9 @@
 import { useState, useMemo, useCallback } from "react";
 import { ChapterNavContext } from "./ChapterNavContext";
 import type { ChapterNav } from "./ChapterNavContext";
+import { ThemeProvider } from "./theme/ThemeContext";
+import { ModelProvider } from "./contexts/ModelContext";
+import ThemeSelector from "./theme/ThemeSelector";
 import BigPicture from "./chapters/BigPicture";
 import Dataset from "./chapters/Dataset";
 import Tokenization from "./chapters/Tokenization";
@@ -201,6 +204,8 @@ function App() {
   );
 
   return (
+    <ThemeProvider>
+    <ModelProvider>
     <ChapterNavContext.Provider value={navContext}>
       <div className="h-screen w-screen flex bg-slate-900 overflow-hidden">
         {/* Sidebar Navigation */}
@@ -352,10 +357,11 @@ function App() {
                 {chapter.title}
               </span>
             </div>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-3">
               <span className="text-[11px] text-slate-600 tabular-nums">
                 {activeChapter + 1}/{chapters.length}
               </span>
+              <ThemeSelector />
             </div>
           </div>
 
@@ -369,6 +375,8 @@ function App() {
         </main>
       </div>
     </ChapterNavContext.Provider>
+    </ModelProvider>
+    </ThemeProvider>
   );
 }
 
