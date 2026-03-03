@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
-import Layout from '../components/Layout';
-import { useCodePanel } from '../CodePanelContext';
+import { useState, useMemo, useCallback } from "react";
+import Layout from "../components/Layout";
+import { useCodePanel } from "../CodePanelContext";
 
 // Simple seeded pseudo-random for gaussian sampling (Box-Muller)
 function gaussianSample(mean: number, std: number): number {
@@ -30,7 +30,7 @@ export default function Hyperparameters() {
 
   const handleSampleClick = useCallback(() => {
     const newSamples: number[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 25; i++) {
       newSamples.push(gaussianSample(0, 0.08));
     }
     setGaussianSamples((prev) => [...prev, ...newSamples]);
@@ -41,11 +41,11 @@ export default function Hyperparameters() {
   }, []);
   useCodePanel({
     pyHighlight: [[74, 80]],
-    jsHighlight: [[104, 111]],
+    jsHighlight: [[100, 109]],
     title: "Hyperparameters",
-    blogExcerpt: "Hyperparameters define the model's structure — they are chosen by the programmer, not learned by training.",
+    blogExcerpt:
+      "Hyperparameters define the model's structure — they are chosen by the programmer, not learned by training.",
   });
-
 
   const leftContent = (
     <div className="space-y-6">
@@ -62,34 +62,60 @@ export default function Hyperparameters() {
       {/* What are parameters? */}
       <div className="space-y-3">
         <p className="text-slate-300 leading-relaxed text-sm">
-          The <span className="text-violet-400 font-medium">parameters</span> are the knowledge of the
-          model -- a large collection of floating point numbers that start out random and are iteratively
-          updated during training to make the model's predictions better. Each parameter is wrapped in a{' '}
-          <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">Value</code> object
-          for autograd (automatic gradient computation).
+          The <span className="text-violet-400 font-medium">parameters</span>{" "}
+          are the knowledge of the model -- a large collection of floating point
+          numbers that start out random and are iteratively updated during
+          training to make the model's predictions better. Each parameter is
+          wrapped in a{" "}
+          <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            Value
+          </code>{" "}
+          object for autograd (automatic gradient computation).
         </p>
         <p className="text-slate-300 leading-relaxed text-sm">
-          Think of parameters as the <span className="text-amber-400 font-medium">knobs on a giant mixing board</span>.
-          Each knob controls how the model processes information. At first, they are set randomly.
-          Training adjusts them until the model produces good outputs.
+          Think of parameters as the{" "}
+          <span className="text-amber-400 font-medium">
+            knobs on a giant mixing board
+          </span>
+          . Each knob controls how the model processes information. At first,
+          they are set randomly. Training adjusts them until the model produces
+          good outputs.
         </p>
       </div>
 
       {/* Hyperparameters */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-200">Hyperparameters</h2>
+        <h2 className="text-lg font-semibold text-slate-200">
+          Hyperparameters
+        </h2>
         <p className="text-slate-300 leading-relaxed text-sm">
-          Before we can create parameters, we need <span className="text-violet-400 font-medium">hyperparameters</span> --
-          the settings that define the model's structure. These are chosen by the programmer, not learned
-          by training.
+          Before we can create parameters, we need{" "}
+          <span className="text-violet-400 font-medium">hyperparameters</span>{" "}
+          -- the settings that define the model's structure. These are chosen by
+          the programmer, not learned by training.
         </p>
         <div className="space-y-2">
           {[
-            { name: 'n_embd = 16', desc: 'Embedding dimension -- how rich each token\'s representation is' },
-            { name: 'n_head = 4', desc: 'Attention heads -- how many different patterns to look for simultaneously' },
-            { name: 'n_layer = 1', desc: 'Depth -- how many times to repeat the attention + MLP processing' },
-            { name: 'block_size = 16', desc: 'Max context length -- how far back the model can look' },
-            { name: 'head_dim = 4', desc: 'Derived: n_embd // n_head -- dimension of each attention head' },
+            {
+              name: "n_embd = 16",
+              desc: "Embedding dimension -- how rich each token's representation is",
+            },
+            {
+              name: "n_head = 4",
+              desc: "Attention heads -- how many different patterns to look for simultaneously",
+            },
+            {
+              name: "n_layer = 1",
+              desc: "Depth -- how many times to repeat the attention + MLP processing",
+            },
+            {
+              name: "block_size = 16",
+              desc: "Max context length -- how far back the model can look",
+            },
+            {
+              name: "head_dim = 4",
+              desc: "Derived: n_embd // n_head -- dimension of each attention head",
+            },
           ].map((hp) => (
             <div
               key={hp.name}
@@ -98,7 +124,9 @@ export default function Hyperparameters() {
               <code className="text-violet-400 bg-slate-900/60 px-2 py-0.5 rounded text-xs font-mono whitespace-nowrap flex-shrink-0">
                 {hp.name}
               </code>
-              <span className="text-xs text-slate-400 leading-relaxed">{hp.desc}</span>
+              <span className="text-xs text-slate-400 leading-relaxed">
+                {hp.desc}
+              </span>
             </div>
           ))}
         </div>
@@ -106,30 +134,61 @@ export default function Hyperparameters() {
 
       {/* The matrix() Function */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-200">The matrix() Function</h2>
+        <h2 className="text-lg font-semibold text-slate-200">
+          The matrix() Function
+        </h2>
         <p className="text-slate-300 leading-relaxed text-sm">
-          The code defines a tiny helper: <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">matrix = lambda nout, nin: [[Value(gauss(0, 0.08)) for _ in range(nin)] for _ in range(nout)]</code>
+          The code defines a tiny helper:{" "}
+          <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            matrix = lambda nout, nin: [[Value(gauss(0, 0.08)) for _ in
+            range(nin)] for _ in range(nout)]
+          </code>
         </p>
         <p className="text-slate-300 leading-relaxed text-sm">
-          This one-liner creates a <span className="text-amber-400 font-medium">2D grid</span> of <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">nout x nin</code> random numbers, each wrapped in a <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">Value</code> object for automatic gradient tracking. The random numbers come from a Gaussian (bell curve) distribution.
+          This one-liner creates a{" "}
+          <span className="text-amber-400 font-medium">2D grid</span> of{" "}
+          <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            nout x nin
+          </code>{" "}
+          random numbers, each wrapped in a{" "}
+          <code className="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            Value
+          </code>{" "}
+          object for automatic gradient tracking. The random numbers come from a
+          Gaussian (bell curve) distribution.
         </p>
         <p className="text-slate-300 leading-relaxed text-sm">
-          Why random? If all parameters started at the same value, every neuron would compute the same thing — they'd never <span className="text-violet-400 font-medium">differentiate</span>. Small random values <span className="text-emerald-400 font-medium">break symmetry</span>, giving each neuron a unique starting point so they can learn different features.
+          Why random? If all parameters started at the same value, every neuron
+          would compute the same thing — they'd never{" "}
+          <span className="text-violet-400 font-medium">differentiate</span>.
+          Small random values{" "}
+          <span className="text-emerald-400 font-medium">break symmetry</span>,
+          giving each neuron a unique starting point so they can learn different
+          features.
         </p>
       </div>
 
       {/* Gaussian Initialization */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-200">Gaussian Initialization</h2>
+        <h2 className="text-lg font-semibold text-slate-200">
+          Gaussian Initialization
+        </h2>
         <p className="text-slate-300 leading-relaxed text-sm">
-          Parameters start as random numbers drawn from a{' '}
-          <span className="text-violet-400 font-medium">bell curve</span> (Gaussian distribution) with
-          mean <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">0</code> and
-          standard deviation <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">0.08</code>.
+          Parameters start as random numbers drawn from a{" "}
+          <span className="text-violet-400 font-medium">bell curve</span>{" "}
+          (Gaussian distribution) with mean{" "}
+          <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            0
+          </code>{" "}
+          and standard deviation{" "}
+          <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">
+            0.08
+          </code>
+          .
         </p>
         <p className="text-slate-300 leading-relaxed text-sm">
-          Small random numbers -- not zeros (that would make everything identical) and not large
-          (that would cause instability).
+          Small random numbers -- not zeros (that would make everything
+          identical) and not large (that would cause instability).
         </p>
       </div>
 
@@ -139,7 +198,8 @@ export default function Hyperparameters() {
           Gaussian Initialization
         </h2>
         <p className="text-xs text-slate-400 mb-3">
-          Click "Sample" to draw random parameter values. Watch the bell curve emerge.
+          Click "Sample" to draw random parameter values. Watch the bell curve
+          emerge.
         </p>
 
         {/* Histogram */}
@@ -149,27 +209,71 @@ export default function Hyperparameters() {
             COUNT
           </div>
 
-          {/* Bars */}
-          <div className="flex justify-center gap-px h-32 ml-3">
-            {gaussianHistogram.counts.map((count, i) => {
-              const height = gaussianHistogram.maxCount > 0 ? (count / gaussianHistogram.maxCount) * 100 : 0;
-              const binCenter = gaussianHistogram.min + (i + 0.5) * gaussianHistogram.binWidth;
-              const isCenter = Math.abs(binCenter) < 0.02;
-              return (
-                <div
-                  key={i}
-                  className="flex-1 flex flex-col items-center justify-end"
-                  title={`${binCenter.toFixed(3)}: ${count} samples`}
-                >
+          {/* Bars + bell curve overlay */}
+          <div className="relative h-32 ml-3">
+            {/* Faint dashed bell curve (Gaussian PDF) */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox="0 0 400 128"
+              preserveAspectRatio="none"
+            >
+              <path
+                d={(() => {
+                  const pts: string[] = [];
+                  const mean = 0,
+                    std = 0.08;
+                  const lo = -0.35,
+                    hi = 0.35;
+                  // peak PDF value at mean
+                  const peakPdf = 1 / (std * Math.sqrt(2 * Math.PI));
+                  for (let i = 0; i <= 400; i++) {
+                    const x = lo + (i / 400) * (hi - lo);
+                    const z = (x - mean) / std;
+                    const pdf =
+                      Math.exp(-0.5 * z * z) / (std * Math.sqrt(2 * Math.PI));
+                    // map pdf to y: top=4 (small margin), bottom=128
+                    const y = 128 - (pdf / peakPdf) * 120;
+                    pts.push(`${i === 0 ? "M" : "L"}${i},${y.toFixed(1)}`);
+                  }
+                  return pts.join(" ");
+                })()}
+                fill="none"
+                stroke="var(--accent-violet, #a78bfa)"
+                strokeWidth="1.5"
+                strokeDasharray="6 4"
+                opacity="0.35"
+              />
+            </svg>
+
+            {/* Histogram bars */}
+            <div className="relative flex justify-center gap-px h-full">
+              {gaussianHistogram.counts.map((count, i) => {
+                const height =
+                  gaussianHistogram.maxCount > 0
+                    ? (count / gaussianHistogram.maxCount) * 100
+                    : 0;
+                const binCenter =
+                  gaussianHistogram.min +
+                  (i + 0.5) * gaussianHistogram.binWidth;
+                const isCenter = Math.abs(binCenter) < 0.02;
+                return (
                   <div
-                    className={`w-full rounded-t-sm transition-all duration-300 ${
-                      isCenter ? 'bg-violet-400' : 'bg-violet-400/60'
-                    }`}
-                    style={{ height: `${Math.max(height, count > 0 ? 2 : 0)}%` }}
-                  />
-                </div>
-              );
-            })}
+                    key={i}
+                    className="flex-1 flex flex-col items-center justify-end"
+                    title={`${binCenter.toFixed(3)}: ${count} samples`}
+                  >
+                    <div
+                      className={`w-full rounded-t-sm transition-all duration-300 ${
+                        isCenter ? "bg-violet-400" : "bg-violet-400/60"
+                      }`}
+                      style={{
+                        height: `${Math.max(height, count > 0 ? 2 : 0)}%`,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* X axis */}
@@ -186,7 +290,7 @@ export default function Hyperparameters() {
             onClick={handleSampleClick}
             className="text-xs px-4 py-1.5 rounded-lg bg-violet-500/20 border border-violet-400/40 text-violet-300 hover:bg-violet-500/30 transition-all cursor-pointer"
           >
-            Sample 10 Parameters
+            Sample 25 Parameters
           </button>
           {gaussianSamples.length > 0 && (
             <button
@@ -197,7 +301,10 @@ export default function Hyperparameters() {
             </button>
           )}
           <span className="text-xs text-slate-500 ml-auto">
-            <span className="text-violet-400 font-mono font-semibold">{gaussianSamples.length}</span> samples
+            <span className="text-violet-400 font-mono font-semibold">
+              {gaussianSamples.length}
+            </span>{" "}
+            samples
           </span>
         </div>
 

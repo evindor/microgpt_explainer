@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Layout from "../components/Layout";
 import { useCodePanel } from "../CodePanelContext";
+import "katex/dist/katex.min.css";
+import { InlineMath } from "react-katex";
 
 /* ------------------------------------------------------------------ */
 /*  Node positions for the computation graph                          */
@@ -29,22 +31,22 @@ const EDGES: [keyof typeof NODES, keyof typeof NODES][] = [
 /* ------------------------------------------------------------------ */
 const FORWARD_STEPS = [
   {
-    desc: "Inputs ready: a = 2, b = 3, c = 1",
+    desc: (<>Inputs ready: <InlineMath math="a = 2,\; b = 3,\; c = 1" /></>),
     active: ["a", "b", "c"],
     values: {} as Record<string, string>,
   },
   {
-    desc: "a \u00d7 b = 2 \u00d7 3 = 6",
+    desc: (<><InlineMath math="a \times b = 2 \times 3 = 6" /></>),
     active: ["a", "b", "mul"],
     values: { mul: "6" },
   },
   {
-    desc: "(a\u00d7b) + c = 6 + 1 = 7",
+    desc: (<><InlineMath math="(a \times b) + c = 6 + 1 = 7" /></>),
     active: ["mul", "c", "add"],
     values: { mul: "6", add: "7" },
   },
   {
-    desc: "(a\u00d7b + c)\u00b2 = 7\u00b2 = 49",
+    desc: (<><InlineMath math="(a \times b + c)^2 = 7^2 = 49" /></>),
     active: ["add", "sq", "loss"],
     values: { mul: "6", add: "7", sq: "49", loss: "49" },
   },
@@ -52,35 +54,32 @@ const FORWARD_STEPS = [
 
 const BACKWARD_STEPS = [
   {
-    desc: "Seed: \u2202loss/\u2202loss = 1",
+    desc: (<>Seed: <InlineMath math="\dfrac{\partial \text{loss}}{\partial \text{loss}} = 1" /></>),
     grads: { loss: "1" } as Record<string, string>,
     active: ["loss"],
     explanation:
       'Every backward pass starts the same way: the loss node gets a gradient of 1. This just means "the loss affects itself by exactly 1" \u2014 it\u2019s our starting point for tracing blame backward through the graph.',
   },
   {
-    desc: "x\u00b2 derivative: 2 \u00d7 7 = 14",
+    desc: (<><InlineMath math="x^2" /> derivative: <InlineMath math="\dfrac{d}{dx}x^2 = 2x = 2 \times 7 = 14" /></>),
     grads: { loss: "1", sq: "14" },
     active: ["loss", "sq"],
-    explanation:
-      "The x\u00b2 node computed 7\u00b2 = 49 during the forward pass. The derivative of x\u00b2 is 2x. Since the input was 7, the local gradient is 2 \u00d7 7 = 14. This means: if the input to x\u00b2 changed by 1, the output would change 14\u00d7 as much.",
+    explanation: (<>The <InlineMath math="x^2" /> node computed <InlineMath math="7^2 = 49" /> during the forward pass. The derivative of <InlineMath math="x^2" /> is <InlineMath math="2x" />. Since the input was 7, the local gradient is <InlineMath math="2 \times 7 = 14" />. This means: if the input changed by 1, the output would change 14\u00d7 as much.</>),
   },
   {
-    desc: "Grad flows through to the + node: 14",
+    desc: (<>Grad flows through to the <code>+</code> node: 14</>),
     grads: { loss: "1", sq: "14", add: "14" },
     active: ["sq", "add"],
-    explanation:
-      "The x\u00b2 node has exactly one input: the + node. When there\u2019s only one path, the gradient passes straight through unchanged. The + node receives the full gradient of 14.",
+    explanation: (<>The <InlineMath math="x^2" /> node has exactly one input: the + node. When there{"\u2019"}s only one path, the gradient passes straight through unchanged. The + node receives the full gradient of 14.</>),
   },
   {
-    desc: "+ distributes grad equally: \u00d7 gets 14, c gets 14",
+    desc: (<><code>+</code> distributes grad equally: <InlineMath math="\times" /> gets 14, <InlineMath math="c" /> gets 14</>),
     grads: { loss: "1", sq: "14", add: "14", mul: "14", c: "14" },
     active: ["add", "mul", "c"],
-    explanation:
-      "Addition is the simplest operation in backprop: it copies the incoming gradient to both inputs equally. Both the \u00d7 node and c receive 14. Think about it: if you increase either input to a sum by 1, the sum also increases by 1 \u2014 so the rate of change is always 1 \u00d7 incoming gradient.",
+    explanation: "Addition is the simplest operation in backprop: it copies the incoming gradient to both inputs equally. Both the \u00d7 node and c receive 14. Think about it: if you increase either input to a sum by 1, the sum also increases by 1 \u2014 so the rate of change is always 1 \u00d7 incoming gradient.",
   },
   {
-    desc: "\u00d7 node: \u2202/\u2202a = b\u00d714 = 42,  \u2202/\u2202b = a\u00d714 = 28",
+    desc: (<><InlineMath math="\times" /> node: <InlineMath math="\dfrac{\partial}{\partial a} = b \cdot 14 = 42" />, <InlineMath math="\dfrac{\partial}{\partial b} = a \cdot 14 = 28" /></>),
     grads: {
       loss: "1",
       sq: "14",
@@ -91,8 +90,7 @@ const BACKWARD_STEPS = [
       b: "28",
     },
     active: ["mul", "a", "b"],
-    explanation:
-      "Multiplication swaps and scales: to get a\u2019s gradient, multiply the other input (b = 3) by the incoming gradient (14), giving 3 \u00d7 14 = 42. For b, use a = 2, giving 2 \u00d7 14 = 28. This makes intuitive sense \u2014 the bigger your partner in a multiplication, the more your small change gets amplified.",
+    explanation: (<>Multiplication swaps and scales: to get <InlineMath math="a" />{"\u2019"}s gradient, multiply the other input (<InlineMath math="b = 3" />) by the incoming gradient (14), giving <InlineMath math="3 \times 14 = 42" />. For <InlineMath math="b" />, use <InlineMath math="a = 2" />, giving <InlineMath math="2 \times 14 = 28" />.</>),
   },
 ];
 
@@ -128,58 +126,58 @@ const ACC_BASE: Record<string, string> = { a: "2", b: "3" };
 
 const ACC_FORWARD = [
   {
-    desc: "Inputs ready: a = 2, b = 3",
+    desc: (<>Inputs ready: <InlineMath math="a = 2,\; b = 3" /></>),
     active: ["a", "b"],
     values: {} as Record<string, string>,
-    explanation: "We start with two inputs. Notice that a connects to two places \u2014 both the \u00d7 node and the + node. This will matter during the backward pass.",
+    explanation: (<>We start with two inputs. Notice that <InlineMath math="a" /> connects to two places {"\u2014"} both the <InlineMath math="\times" /> node and the + node. This will matter during the backward pass.</>),
   },
   {
-    desc: "c = a \u00d7 b = 2 \u00d7 3 = 6",
+    desc: (<><InlineMath math="c = a \times b = 2 \times 3 = 6" /></>),
     active: ["a", "b", "mul"],
     values: { mul: "6" },
-    explanation: "The multiplication node computes a \u00d7 b = 6. This result feeds into the + node.",
+    explanation: (<>The multiplication node computes <InlineMath math="a \times b = 6" />. This result feeds into the + node.</>),
   },
   {
-    desc: "L = c + a = 6 + 2 = 8",
+    desc: (<><InlineMath math="L = c + a = 6 + 2 = 8" /></>),
     active: ["mul", "a", "add", "L"],
     values: { mul: "6", add: "8", L: "8" },
-    explanation: "The + node adds the output of \u00d7 (which is 6) and a directly (which is 2), giving L = 8. Notice how a is used twice \u2014 once through \u00d7 and once directly.",
+    explanation: (<>The + node adds the output of <InlineMath math="\times" /> (which is 6) and <InlineMath math="a" /> directly (which is 2), giving <InlineMath math="L = 8" />. Notice how <InlineMath math="a" /> is used twice {"\u2014"} once through <InlineMath math="\times" /> and once directly.</>),
   },
 ];
 
 const ACC_BACKWARD = [
   {
-    desc: "Seed: \u2202L/\u2202L = 1",
+    desc: (<>Seed: <InlineMath math="\dfrac{\partial L}{\partial L} = 1" /></>),
     grads: { L: "1" } as Record<string, string>,
     active: ["L"],
     explanation: "We start at L with gradient 1, same as always.",
   },
   {
-    desc: "+ passes grad 1 to both inputs",
+    desc: (<><code>+</code> passes grad 1 to both inputs</>),
     grads: { L: "1", add: "1", mul: "1" },
     active: ["L", "add"],
-    explanation: "Addition copies its incoming gradient (1) to both inputs. The \u00d7 node gets 1, and a gets 1 through this direct path. But we\u2019re not done with a yet\u2026",
+    explanation: (<>Addition copies its incoming gradient (1) to both inputs. The <InlineMath math="\times" /> node gets 1, and <InlineMath math="a" /> gets 1 through the direct path. But we{"\u2019"}re not done with <InlineMath math="a" /> yet{"\u2026"}</>),
     pathHighlight: "both" as const,
   },
   {
-    desc: "Path 2: + \u2192 a directly, a.grad += 1",
+    desc: (<>Path 2: <code>+</code> {"\u2192"} <InlineMath math="a" /> directly, <InlineMath math="\text{a.grad} \mathrel{+}= 1" /></>),
     grads: { L: "1", add: "1", mul: "1", a: "1" },
     active: ["add", "a"],
-    explanation: "Through the direct connection (the lower edge), a receives a gradient of 1 from the + node. We write a.grad += 1, so a.grad is now 1. This is the first contribution.",
+    explanation: (<>Through the direct connection (the lower edge), <InlineMath math="a" /> receives a gradient of 1 from the + node. We write <InlineMath math="\text{a.grad} \mathrel{+}= 1" />, so <InlineMath math="\text{a.grad} = 1" />. This is the first contribution.</>),
     pathHighlight: "path2" as const,
   },
   {
-    desc: "Path 1: + \u2192 \u00d7 \u2192 a, gradient = b = 3",
+    desc: (<>Path 1: <code>+</code> {"\u2192"} <InlineMath math="\times" /> {"\u2192"} <InlineMath math="a" />, gradient <InlineMath math="= b = 3" /></>),
     grads: { L: "1", add: "1", mul: "1", b: "2", a: "3+1" },
     active: ["mul", "a", "b"],
-    explanation: "Now the \u00d7 node distributes its incoming gradient (1). For a: multiply by b = 3, giving 3. For b: multiply by a = 2, giving 2. We write a.grad += 3, so a.grad is now 1 + 3 = 4. This is the second contribution \u2014 the gradients accumulated!",
+    explanation: (<>Now the <InlineMath math="\times" /> node distributes its incoming gradient (1). For <InlineMath math="a" />: multiply by <InlineMath math="b = 3" />, giving 3. For <InlineMath math="b" />: multiply by <InlineMath math="a = 2" />, giving 2. We write <InlineMath math="\text{a.grad} \mathrel{+}= 3" />, so <InlineMath math="\text{a.grad} = 1 + 3 = 4" />. The gradients accumulated!</>),
     pathHighlight: "path1" as const,
   },
   {
-    desc: "Final: a.grad = 3 + 1 = 4",
+    desc: (<>Final: <InlineMath math="\text{a.grad} = 3 + 1 = 4" /></>),
     grads: { L: "1", add: "1", mul: "1", b: "2", a: "4" },
     active: ["a"],
-    explanation: "a.grad = 4 because a influences L through two separate paths, and we added the contributions: 3 (through \u00d7) + 1 (direct) = 4. This is why the code uses += instead of = when accumulating gradients.",
+    explanation: (<><InlineMath math="\text{a.grad} = 4" /> because <InlineMath math="a" /> influences <InlineMath math="L" /> through two separate paths, and we added the contributions: <InlineMath math="3" /> (through <InlineMath math="\times" />) + <InlineMath math="1" /> (direct) = <InlineMath math="4" />. This is why the code uses <code>+=</code> instead of <code>=</code>.</>),
     pathHighlight: "both" as const,
   },
 ];
@@ -1171,25 +1169,25 @@ export default function Autograd() {
               </th>
             </tr>
           </thead>
-          <tbody className="font-mono text-xs">
+          <tbody className="text-xs">
             <tr className="border-b border-slate-800/50">
-              <td className="py-2.5 px-3 text-slate-300">a + b</td>
-              <td className="py-2.5 px-3 text-cyan-300">a + b</td>
+              <td className="py-2.5 px-3 text-slate-300"><InlineMath math="a + b" /></td>
+              <td className="py-2.5 px-3 text-cyan-300"><InlineMath math="a + b" /></td>
               <td className="py-2.5 px-3 text-rose-300">
-                &part;/&part;a = 1, &nbsp; &part;/&part;b = 1
+                <InlineMath math="\dfrac{\partial}{\partial a} = 1, \quad \dfrac{\partial}{\partial b} = 1" />
               </td>
             </tr>
             <tr className="border-b border-slate-800/50">
-              <td className="py-2.5 px-3 text-slate-300">a &times; b</td>
-              <td className="py-2.5 px-3 text-cyan-300">a &times; b</td>
+              <td className="py-2.5 px-3 text-slate-300"><InlineMath math="a \times b" /></td>
+              <td className="py-2.5 px-3 text-cyan-300"><InlineMath math="a \times b" /></td>
               <td className="py-2.5 px-3 text-rose-300">
-                &part;/&part;a = b, &nbsp; &part;/&part;b = a
+                <InlineMath math="\dfrac{\partial}{\partial a} = b, \quad \dfrac{\partial}{\partial b} = a" />
               </td>
             </tr>
             <tr>
-              <td className="py-2.5 px-3 text-slate-300">a&sup2;</td>
-              <td className="py-2.5 px-3 text-cyan-300">a&sup2;</td>
-              <td className="py-2.5 px-3 text-rose-300">&part;/&part;a = 2a</td>
+              <td className="py-2.5 px-3 text-slate-300"><InlineMath math="a^2" /></td>
+              <td className="py-2.5 px-3 text-cyan-300"><InlineMath math="a^2" /></td>
+              <td className="py-2.5 px-3 text-rose-300"><InlineMath math="\dfrac{\partial}{\partial a} = 2a" /></td>
             </tr>
           </tbody>
         </table>
