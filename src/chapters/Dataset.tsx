@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Layout from "../components/Layout";
-import CodePanel from "../components/CodePanel";
+import { useCodePanel } from '../CodePanelContext';
 
 // Real names from the dataset (a representative sample)
 const REAL_NAMES = [
@@ -157,6 +157,13 @@ export default function Dataset() {
     setQuizGuesses({});
     setQuizRevealed(false);
   };
+  useCodePanel({
+    pyHighlight: [[14, 21]],
+    jsHighlight: [[10, 21]],
+    title: "Dataset",
+    blogExcerpt: "The fuel of large language models is a stream of text data, optionally separated into a set of documents. The goal of the model is to learn the patterns in the data and then generate similar new documents that share the statistical patterns within.",
+  });
+
 
   const leftContent = (
     <div className="space-y-6">
@@ -398,14 +405,5 @@ export default function Dataset() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[14, 21]]}
-      jsHighlight={[[10, 21]]}
-      title="Dataset"
-      blogExcerpt="The fuel of large language models is a stream of text data, optionally separated into a set of documents. The goal of the model is to learn the patterns in the data and then generate similar new documents that share the statistical patterns within."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

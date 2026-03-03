@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 function seededRandom(seed: number) {
   let s = seed;
@@ -340,6 +340,13 @@ function useGeneratedData() {
 export default function FullForwardPass() {
   const [step, setStep] = useState(0);
   const data = useGeneratedData();
+  useCodePanel({
+    pyHighlight: PY_STEP_HIGHLIGHTS[step] ?? [],
+    jsHighlight: JS_STEP_HIGHLIGHTS[step] ?? [],
+    title: "Full Forward Pass",
+    blogExcerpt: "Main GPT function processes: Token and position embeddings, Multi-head attention, MLP block, Residual connections",
+  });
+
 
   const leftContent = (
     <div className="space-y-6">
@@ -512,14 +519,5 @@ export default function FullForwardPass() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={PY_STEP_HIGHLIGHTS[step] ?? []}
-      jsHighlight={JS_STEP_HIGHLIGHTS[step] ?? []}
-      title="Full Forward Pass"
-      blogExcerpt="Main GPT function processes: Token and position embeddings, Multi-head attention, MLP block, Residual connections"
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

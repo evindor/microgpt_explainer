@@ -1,5 +1,5 @@
 import Layout from "../components/Layout";
-import CodePanel from "../components/CodePanel";
+import { useCodePanel } from '../CodePanelContext';
 
 const chapters = [
   {
@@ -95,6 +95,13 @@ const chapters = [
 ];
 
 export default function BigPicture() {
+  useCodePanel({
+    pyHighlight: [[1, 7]],
+    jsHighlight: [[1, 7]],
+    title: "The Complete Algorithm",
+    blogExcerpt: "This file contains the full algorithmic content of what is needed: dataset of documents, tokenizer, autograd engine, a GPT-2-like neural network architecture, the Adam optimizer, training loop, and inference loop. Everything else is just efficiency. I cannot simplify this any further.",
+  });
+
   const leftContent = (
     <div className="space-y-6">
       {/* Welcome header */}
@@ -215,14 +222,5 @@ export default function BigPicture() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[1, 7]]}
-      jsHighlight={[[1, 7]]}
-      title="The Complete Algorithm"
-      blogExcerpt="This file contains the full algorithmic content of what is needed: dataset of documents, tokenizer, autograd engine, a GPT-2-like neural network architecture, the Adam optimizer, training loop, and inference loop. Everything else is just efficiency. I cannot simplify this any further."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

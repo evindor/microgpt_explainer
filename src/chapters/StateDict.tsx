@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 // Parameter matrix definitions for the breakdown visualization
 const PARAM_MATRICES: { name: string; label: string; rows: number; cols: number; color: string }[] = [
@@ -35,6 +35,13 @@ const colorMap: Record<string, { bg: string; border: string; text: string; fill:
 
 export default function StateDict() {
   const [hoveredMatrix, setHoveredMatrix] = useState<number>(0);
+  useCodePanel({
+    pyHighlight: [[81, 90]],
+    jsHighlight: [[112, 122]],
+    title: "State Dict",
+    blogExcerpt: "Parameters are organized into named matrices stored in a Python dictionary called state_dict. Each matrix has a specific job in the model.",
+  });
+
 
   const leftContent = (
     <div className="space-y-6">
@@ -206,14 +213,5 @@ export default function StateDict() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[81, 90]]}
-      jsHighlight={[[112, 122]]}
-      title="State Dict"
-      blogExcerpt="Parameters are organized into named matrices stored in a Python dictionary called state_dict. Each matrix has a specific job in the model."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

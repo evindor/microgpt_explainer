@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 /* ------------------------------------------------------------------ */
 /*  Scaling table data                                                 */
@@ -163,6 +163,13 @@ export default function RealStuff() {
   /* ================================================================ */
   /*  Left panel                                                       */
   /* ================================================================ */
+  useCodePanel({
+    pyHighlight: [[1, 7]],
+    jsHighlight: [[1, 7]],
+    title: "The Complete Algorithm",
+    blogExcerpt: "All of these are important engineering and research contributions but if you understand microgpt, you understand the algorithmic essence.",
+  });
+
   const leftContent = (
     <div className="space-y-6">
       {/* ---- Chapter header ---- */}
@@ -399,14 +406,6 @@ export default function RealStuff() {
   /* ================================================================ */
   /*  Right panel                                                      */
   /* ================================================================ */
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[1, 7]]}
-      jsHighlight={[[1, 7]]}
-      title="The Complete Algorithm"
-      blogExcerpt="All of these are important engineering and research contributions but if you understand microgpt, you understand the algorithmic essence."
-    />
-  );
 
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

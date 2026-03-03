@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 function valueToBg(v: number): string {
   if (v > 0) {
@@ -61,6 +61,13 @@ export default function VectorsMatrices() {
 
   // Example embedding vector
   const exampleVec = [0.3, -0.1, 0.8, 0.2, -0.5, 0.6, -0.9, 0.1, 0.4, -0.3, 0.7, -0.2, 0.5, 0.0, -0.4, 0.3];
+  useCodePanel({
+    pyHighlight: [[80, 80], [94, 95]],
+    jsHighlight: [[100, 102], [110, 111], [126, 128]],
+    title: "Linear Algebra",
+    blogExcerpt: "linear: Matrix-vector multiplication—the fundamental building block",
+  });
+
 
   const leftContent = (
     <div className="space-y-8">
@@ -418,14 +425,5 @@ export default function VectorsMatrices() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[80, 80], [94, 95]]}
-      jsHighlight={[[100, 102], [110, 111], [126, 128]]}
-      title="Linear Algebra"
-      blogExcerpt="linear: Matrix-vector multiplication—the fundamental building block"
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

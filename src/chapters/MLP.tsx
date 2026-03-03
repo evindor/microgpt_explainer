@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 /* ------------------------------------------------------------------ */
 /*  ReLU Visualization                                                 */
@@ -230,6 +230,13 @@ function ResidualDiagram() {
 /*  Main Chapter Component                                             */
 /* ------------------------------------------------------------------ */
 export default function MLP() {
+  useCodePanel({
+    pyHighlight: [[135, 141]],
+    jsHighlight: [[172, 178]],
+    title: "MLP & Norms",
+    blogExcerpt: "The MLP block is a feed-forward computation. RMSNorm rescales vectors for stable training. Residual connections enable gradient flow and trainability.",
+  });
+
   const leftContent = (
     <div className="space-y-8">
       {/* Section header */}
@@ -342,14 +349,5 @@ export default function MLP() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[135, 141]]}
-      jsHighlight={[[172, 178]]}
-      title="MLP & Norms"
-      blogExcerpt="The MLP block is a feed-forward computation. RMSNorm rescales vectors for stable training. Residual connections enable gradient flow and trainability."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

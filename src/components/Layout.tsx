@@ -4,22 +4,20 @@ import { ChapterNavContext } from '../ChapterNavContext';
 
 interface LayoutProps {
   left: ReactNode;
-  right: ReactNode;
+  right?: ReactNode; // kept for compat but ignored — CodePanel is now persistent in App
 }
 
-export default function Layout({ left, right }: LayoutProps) {
+export default function Layout({ left }: LayoutProps) {
   const nav = useContext(ChapterNavContext);
 
   return (
-    <div className="flex h-full w-full animate-fade-in">
-      {/* Left panel: explanations + visualizations */}
-      <div className="w-1/2 h-full overflow-y-auto border-r border-slate-700/50 p-6">
-        {left}
+    <div className="h-full w-full overflow-y-auto border-r border-slate-700/50 p-6 animate-fade-in">
+      {left}
 
-        {/* Chapter navigation buttons */}
-        {nav && (
-          <div className="mt-12 mb-4 flex items-center gap-3">
-            {nav.hasPrev ? (
+      {/* Chapter navigation buttons */}
+      {nav && (
+        <div className="mt-12 mb-4 flex items-center gap-3">
+          {nav.hasPrev ? (
               <button
                 onClick={nav.onPrev}
                 className="flex-1 group flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-700/60 bg-slate-800/40 hover:bg-slate-800/80 hover:border-slate-600 transition-all duration-150"
@@ -54,12 +52,6 @@ export default function Layout({ left, right }: LayoutProps) {
             )}
           </div>
         )}
-      </div>
-
-      {/* Right panel: code + blog excerpts */}
-      <div className="w-1/2 h-full bg-slate-950/50 overflow-hidden">
-        {right}
-      </div>
     </div>
   );
 }

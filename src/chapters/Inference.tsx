@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 import InferenceViz from '../components/InferenceViz';
 
 /* ── softmax ──────────────────────────────────────────────── */
@@ -68,6 +68,13 @@ export default function Inference() {
   const plotH = chartH - labelH - 10;
 
   /* ── LEFT CONTENT ────────────────────────────────────────── */
+  useCodePanel({
+    pyHighlight: [[186, 201]],
+    jsHighlight: [[227, 243]],
+    title: "Inference",
+    blogExcerpt: "Temperature parameter controls randomness: lower values pick top choices, higher values produce more diverse but less coherent output.",
+  });
+
   const leftContent = (
     <div className="space-y-6">
       {/* ── Header ──────────────────────────────────────────── */}
@@ -432,14 +439,6 @@ export default function Inference() {
   );
 
   /* ── RIGHT CONTENT ───────────────────────────────────────── */
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[186, 201]]}
-      jsHighlight={[[227, 243]]}
-      title="Inference"
-      blogExcerpt="Temperature parameter controls randomness: lower values pick top choices, higher values produce more diverse but less coherent output."
-    />
-  );
 
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

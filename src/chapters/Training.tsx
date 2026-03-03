@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 import TrainingDashboard from '../components/TrainingDashboard';
 
 const PIPELINE_STEPS = [
@@ -96,6 +96,13 @@ export default function Training() {
     }
     return `M${pts.join(' L')}`;
   }, []);
+  useCodePanel({
+    pyHighlight: [[146, 184]],
+    jsHighlight: [[184, 225]],
+    title: "Training Loop",
+    blogExcerpt: "Loss decreases from approximately 3.3 (random guessing) to 2.37 during training.",
+  });
+
 
   const leftContent = (
     <div className="space-y-8">
@@ -580,14 +587,5 @@ export default function Training() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[146, 184]]}
-      jsHighlight={[[184, 225]]}
-      title="Training Loop"
-      blogExcerpt="Loss decreases from approximately 3.3 (random guessing) to 2.37 during training."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

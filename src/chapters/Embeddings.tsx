@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 /* ── seeded PRNG ────────────────────────────────────────────── */
 function seededRandom(seed: number) {
@@ -108,6 +108,13 @@ export default function Embeddings() {
   }, [selectedToken]);
 
   /* ── LEFT CONTENT ──────────────────────────────────────────── */
+  useCodePanel({
+    pyHighlight: [[74, 81], [108, 112]],
+    jsHighlight: [[104, 112], [143, 147]],
+    title: "Embeddings",
+    blogExcerpt: "Token and position embeddings combined into input representation",
+  });
+
   const leftContent = (
     <div className="space-y-6">
       {/* ── Header ────────────────────────────────────────────── */}
@@ -332,14 +339,6 @@ export default function Embeddings() {
   );
 
   /* ── RIGHT CONTENT ─────────────────────────────────────────── */
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[74, 81], [108, 112]]}
-      jsHighlight={[[104, 112], [143, 147]]}
-      title="Embeddings"
-      blogExcerpt="Token and position embeddings combined into input representation"
-    />
-  );
 
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

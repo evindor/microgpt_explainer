@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 /* ------------------------------------------------------------------ */
 /*  Softmax Interactive Visualization                                  */
@@ -282,6 +282,13 @@ function RMSNormVisualization() {
 /* ------------------------------------------------------------------ */
 
 export default function SoftmaxNorm() {
+  useCodePanel({
+    pyHighlight: [[97, 106]],
+    jsHighlight: [[130, 141]],
+    title: "Softmax & RMSNorm",
+    blogExcerpt: "Softmax converts logits to probabilities. RMSNorm rescales vectors for stable training. Both are essential for keeping numbers well-behaved.",
+  });
+
   const leftContent = (
     <div className="space-y-6">
       {/* Section Header */}
@@ -323,14 +330,5 @@ export default function SoftmaxNorm() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[97, 106]]}
-      jsHighlight={[[130, 141]]}
-      title="Softmax & RMSNorm"
-      blogExcerpt="Softmax converts logits to probabilities. RMSNorm rescales vectors for stable training. Both are essential for keeping numbers well-behaved."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

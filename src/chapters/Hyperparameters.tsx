@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 // Simple seeded pseudo-random for gaussian sampling (Box-Muller)
 function gaussianSample(mean: number, std: number): number {
@@ -39,6 +39,13 @@ export default function Hyperparameters() {
   const handleResetSamples = useCallback(() => {
     setGaussianSamples([]);
   }, []);
+  useCodePanel({
+    pyHighlight: [[74, 80]],
+    jsHighlight: [[104, 111]],
+    title: "Hyperparameters",
+    blogExcerpt: "Hyperparameters define the model's structure — they are chosen by the programmer, not learned by training.",
+  });
+
 
   const leftContent = (
     <div className="space-y-6">
@@ -212,14 +219,5 @@ export default function Hyperparameters() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[74, 80]]}
-      jsHighlight={[[104, 111]]}
-      title="Hyperparameters"
-      blogExcerpt="Hyperparameters define the model's structure — they are chosen by the programmer, not learned by training."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

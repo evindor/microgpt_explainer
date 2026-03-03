@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import Layout from '../components/Layout';
-import CodePanel from '../components/CodePanel';
+import { useCodePanel } from '../CodePanelContext';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -430,6 +430,13 @@ function MultiHeadDiagram() {
 /* ------------------------------------------------------------------ */
 
 export default function Attention() {
+  useCodePanel({
+    pyHighlight: [[114, 134]],
+    jsHighlight: [[149, 171]],
+    title: "Multi-Head Attention",
+    blogExcerpt: "Attention is the exact and only place where a token at position t gets to 'look' at tokens in the past",
+  });
+
   const leftContent = (
     <div className="space-y-8">
       {/* ---- Section Header ---- */}
@@ -789,14 +796,5 @@ export default function Attention() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[114, 134]]}
-      jsHighlight={[[149, 171]]}
-      title="Multi-Head Attention"
-      blogExcerpt="Attention is the exact and only place where a token at position t gets to 'look' at tokens in the past"
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

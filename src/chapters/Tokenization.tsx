@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import Layout from "../components/Layout";
-import CodePanel from "../components/CodePanel";
+import { useCodePanel } from '../CodePanelContext';
 
 const VOCAB = "abcdefghijklmnopqrstuvwxyz";
 const BOS_ID = 26;
@@ -64,6 +64,13 @@ export default function Tokenization() {
     }
     return s;
   }, [text]);
+  useCodePanel({
+    pyHighlight: [[23, 27]],
+    jsHighlight: [[23, 27]],
+    title: "Tokenizer",
+    blogExcerpt: "Since neural networks require numbers, not characters, a tokenizer converts text to integer token IDs. The simplest approach assigns one integer per unique character.",
+  });
+
 
   const leftContent = (
     <div className="space-y-6">
@@ -341,14 +348,5 @@ export default function Tokenization() {
     </div>
   );
 
-  const rightContent = (
-    <CodePanel
-      pyHighlight={[[23, 27]]}
-      jsHighlight={[[23, 27]]}
-      title="Tokenizer"
-      blogExcerpt="Since neural networks require numbers, not characters, a tokenizer converts text to integer token IDs. The simplest approach assigns one integer per unique character."
-    />
-  );
-
-  return <Layout left={leftContent} right={rightContent} />;
+  return <Layout left={leftContent} />;
 }

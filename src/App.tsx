@@ -1,6 +1,9 @@
 import { useState, useMemo, useCallback } from "react";
 import { ChapterNavContext } from "./ChapterNavContext";
 import type { ChapterNav } from "./ChapterNavContext";
+import { CodePanelContext } from "./CodePanelContext";
+import type { CodePanelConfig } from "./CodePanelContext";
+import CodePanel from "./components/CodePanel";
 import { ThemeProvider } from "./theme/ThemeContext";
 import { ModelProvider } from "./contexts/ModelContext";
 import ThemeSelector from "./theme/ThemeSelector";
@@ -176,6 +179,17 @@ const chapters = [
 function App() {
   const [activeChapter, setActiveChapter] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [codePanelConfig, setCodePanelConfig] = useState<CodePanelConfig>({
+    pyHighlight: [],
+    jsHighlight: [],
+    title: "",
+    blogExcerpt: "",
+  });
+
+  const codePanelCtx = useMemo(
+    () => ({ config: codePanelConfig, setConfig: setCodePanelConfig }),
+    [codePanelConfig],
+  );
 
   const ActiveComponent = chapters[activeChapter].component;
   const chapter = chapters[activeChapter];
@@ -404,12 +418,25 @@ function App() {
               </div>
 
               {/* Chapter Content */}
-              <div
-                className="h-[calc(100%-2.75rem)] overflow-hidden"
-                key={activeChapter}
-              >
-                <ActiveComponent />
-              </div>
+              <CodePanelContext.Provider value={codePanelCtx}>
+                <div
+                  className="h-[calc(100%-2.75rem)] overflow-hidden flex"
+                >
+                  {/* Left half: chapter explainer (remounts per chapter for fade-in) */}
+                  <div className="w-1/2 h-full overflow-hidden" key={activeChapter}>
+                    <ActiveComponent />
+                  </div>
+                  {/* Right half: persistent CodePanel (never remounts) */}
+                  <div className="w-1/2 h-full bg-slate-950/50 overflow-hidden">
+                    <CodePanel
+                      pyHighlight={codePanelConfig.pyHighlight}
+                      jsHighlight={codePanelConfig.jsHighlight}
+                      title={codePanelConfig.title}
+                      blogExcerpt={codePanelConfig.blogExcerpt}
+                    />
+                  </div>
+                </div>
+              </CodePanelContext.Provider>
             </main>
           </div>
         </ChapterNavContext.Provider>
