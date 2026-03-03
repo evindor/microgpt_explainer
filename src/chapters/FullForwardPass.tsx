@@ -345,7 +345,7 @@ export default function FullForwardPass() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-1">Chapter 9: The Full Forward Pass</h2>
+        <h2 className="text-2xl font-bold text-white mb-1">Chapter 11: The Full Forward Pass</h2>
         <p className="text-slate-400 text-sm">Putting all the pieces together</p>
       </div>
 

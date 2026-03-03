@@ -116,7 +116,7 @@ export default function Embeddings() {
       {/* ── Header ────────────────────────────────────────────── */}
       <div>
         <h2 className="text-2xl font-bold text-slate-100">
-          Chapter 4: Embeddings
+          Chapter 8: Embeddings
         </h2>
         <p className="text-sm text-slate-400 mt-1">
           Giving meaning to numbers

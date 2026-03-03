@@ -4,10 +4,12 @@ import type { ChapterNav } from "./ChapterNavContext";
 import BigPicture from "./chapters/BigPicture";
 import Dataset from "./chapters/Dataset";
 import Tokenization from "./chapters/Tokenization";
-import VectorsMatrices from "./chapters/VectorsMatrices";
-import Embeddings from "./chapters/Embeddings";
 import Autograd from "./chapters/Autograd";
-import Parameters from "./chapters/Parameters";
+import Hyperparameters from "./chapters/Hyperparameters";
+import VectorsMatrices from "./chapters/VectorsMatrices";
+import StateDict from "./chapters/StateDict";
+import SoftmaxNorm from "./chapters/SoftmaxNorm";
+import Embeddings from "./chapters/Embeddings";
 import Attention from "./chapters/Attention";
 import MLP from "./chapters/MLP";
 import FullForwardPass from "./chapters/FullForwardPass";
@@ -47,28 +49,8 @@ const chapters = [
     component: Tokenization,
   },
   {
-    id: "vectors",
-    num: 3,
-    title: "Vectors & Matrices",
-    icon: "📐",
-    color: "from-blue-500/20 to-indigo-500/20",
-    border: "border-blue-500",
-    text: "text-blue-400",
-    component: VectorsMatrices,
-  },
-  {
-    id: "embeddings",
-    num: 4,
-    title: "Embeddings",
-    icon: "🎯",
-    color: "from-amber-500/20 to-orange-500/20",
-    border: "border-amber-500",
-    text: "text-amber-400",
-    component: Embeddings,
-  },
-  {
     id: "autograd",
-    num: 5,
+    num: 3,
     title: "Autograd Engine",
     icon: "⚡",
     color: "from-violet-500/20 to-purple-500/20",
@@ -77,18 +59,58 @@ const chapters = [
     component: Autograd,
   },
   {
-    id: "parameters",
-    num: 6,
-    title: "Parameters",
+    id: "hyperparameters",
+    num: 4,
+    title: "Hyperparameters",
     icon: "🔧",
     color: "from-fuchsia-500/20 to-violet-500/20",
     border: "border-fuchsia-500",
     text: "text-fuchsia-400",
-    component: Parameters,
+    component: Hyperparameters,
+  },
+  {
+    id: "vectors",
+    num: 5,
+    title: "Vectors & Matrices",
+    icon: "📐",
+    color: "from-blue-500/20 to-indigo-500/20",
+    border: "border-blue-500",
+    text: "text-blue-400",
+    component: VectorsMatrices,
+  },
+  {
+    id: "state-dict",
+    num: 6,
+    title: "State Dict",
+    icon: "📦",
+    color: "from-fuchsia-500/20 to-violet-500/20",
+    border: "border-fuchsia-500",
+    text: "text-fuchsia-400",
+    component: StateDict,
+  },
+  {
+    id: "softmax-norm",
+    num: 7,
+    title: "Softmax & RMSNorm",
+    icon: "⚖️",
+    color: "from-amber-500/20 to-orange-500/20",
+    border: "border-amber-500",
+    text: "text-amber-400",
+    component: SoftmaxNorm,
+  },
+  {
+    id: "embeddings",
+    num: 8,
+    title: "Embeddings",
+    icon: "🎯",
+    color: "from-amber-500/20 to-orange-500/20",
+    border: "border-amber-500",
+    text: "text-amber-400",
+    component: Embeddings,
   },
   {
     id: "attention",
-    num: 7,
+    num: 9,
     title: "Attention",
     icon: "👁️",
     color: "from-rose-500/20 to-pink-500/20",
@@ -98,7 +120,7 @@ const chapters = [
   },
   {
     id: "mlp",
-    num: 8,
+    num: 10,
     title: "MLP & Norms",
     icon: "🧠",
     color: "from-pink-500/20 to-fuchsia-500/20",
@@ -108,7 +130,7 @@ const chapters = [
   },
   {
     id: "forward-pass",
-    num: 9,
+    num: 11,
     title: "Full Forward Pass",
     icon: "🔄",
     color: "from-teal-500/20 to-cyan-500/20",
@@ -118,7 +140,7 @@ const chapters = [
   },
   {
     id: "training",
-    num: 10,
+    num: 12,
     title: "Training",
     icon: "📉",
     color: "from-indigo-500/20 to-violet-500/20",
@@ -128,7 +150,7 @@ const chapters = [
   },
   {
     id: "inference",
-    num: 11,
+    num: 13,
     title: "Inference",
     icon: "✨",
     color: "from-orange-500/20 to-amber-500/20",
@@ -138,7 +160,7 @@ const chapters = [
   },
   {
     id: "real-stuff",
-    num: 12,
+    num: 14,
     title: "From microgpt to ChatGPT",
     icon: "🚀",
     color: "from-sky-500/20 to-cyan-500/20",

@@ -253,7 +253,7 @@ export default function Autograd() {
       {/* Section header */}
       <div>
         <h2 className="text-2xl font-bold text-white tracking-tight">
-          Chapter 5: Autograd Engine
+          Chapter 3: Autograd Engine
         </h2>
         <p className="text-sm text-cyan-400 mt-1 font-medium">
           Teaching the computer to learn from mistakes

@@ -144,7 +144,7 @@ export default function Inference() {
       {/* ── Header ──────────────────────────────────────────── */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 11: Inference
+          Chapter 13: Inference
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           The model speaks

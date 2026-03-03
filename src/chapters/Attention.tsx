@@ -435,7 +435,7 @@ export default function Attention() {
       {/* ---- Section Header ---- */}
       <div>
         <h1 className="text-3xl font-bold text-slate-100 tracking-tight">
-          Chapter 7: <span className="text-amber-400">Attention</span>
+          Chapter 9: <span className="text-amber-400">Attention</span>
         </h1>
         <p className="text-slate-400 mt-1 text-lg">How tokens talk to each other</p>
       </div>

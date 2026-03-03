@@ -168,7 +168,7 @@ export default function RealStuff() {
       {/* ---- Chapter header ---- */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 12: From microgpt to ChatGPT
+          Chapter 14: From microgpt to ChatGPT
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           The same algorithm, at scale

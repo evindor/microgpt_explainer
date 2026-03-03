@@ -140,139 +140,6 @@ function ReLUVisualization() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  RMSNorm Visualization                                              */
-/* ------------------------------------------------------------------ */
-function RMSNormVisualization() {
-  const [values, setValues] = useState([1.5, -0.8, 2.1, -1.2]);
-  const eps = 1e-5;
-
-  const squares = values.map(v => v * v);
-  const meanSq = squares.reduce((a, b) => a + b, 0) / values.length;
-  const rms = Math.sqrt(meanSq + eps);
-  const scale = 1 / rms;
-  const output = values.map(v => v * scale);
-
-  const maxAbs = Math.max(
-    ...values.map(Math.abs),
-    ...output.map(Math.abs),
-    0.1
-  );
-
-  const barH = 20;
-  const barMaxW = 120;
-
-  function BarChart({ data, label, color }: { data: number[]; label: string; color: string }) {
-    return (
-      <div className="flex-1">
-        <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">{label}</div>
-        <div className="space-y-1.5">
-          {data.map((v, i) => {
-            const w = (Math.abs(v) / maxAbs) * barMaxW;
-            return (
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-mono w-5">x{i + 1}</span>
-                <div className="relative" style={{ width: barMaxW, height: barH }}>
-                  {/* zero line */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-600" />
-                  {/* bar */}
-                  <div
-                    className="absolute top-0.5 rounded-sm transition-all duration-300"
-                    style={{
-                      height: barH - 4,
-                      width: w / 2,
-                      left: v >= 0 ? '50%' : `calc(50% - ${w / 2}px)`,
-                      backgroundColor: color,
-                      opacity: 0.8,
-                    }}
-                  />
-                </div>
-                <span className="text-xs font-mono text-slate-300 w-12 text-right">{v.toFixed(2)}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="viz-card glow-violet">
-      <h3 className="text-violet-400 font-semibold text-sm uppercase tracking-wider mb-3">
-        RMSNorm Interactive Visualization
-      </h3>
-
-      {/* Sliders */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
-        {values.map((v, i) => (
-          <div key={i}>
-            <label className="text-xs text-slate-400">
-              x<sub>{i + 1}</sub> = <span className="font-mono text-slate-200">{v.toFixed(2)}</span>
-            </label>
-            <input type="range" min={-3} max={3} step={0.01} value={v}
-              onChange={e => {
-                const next = [...values];
-                next[i] = parseFloat(e.target.value);
-                setValues(next);
-              }}
-              className="w-full h-1.5 bg-slate-700 rounded-full appearance-none cursor-pointer
-                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5
-                         [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full
-                         [&::-webkit-slider-thumb]:bg-violet-400 [&::-webkit-slider-thumb]:shadow-lg" />
-          </div>
-        ))}
-      </div>
-
-      {/* Step-by-step computation */}
-      <div className="bg-slate-800/50 rounded-lg p-3 space-y-2 text-sm font-mono mb-4">
-        <div className="text-slate-400">
-          <span className="text-violet-400 font-semibold">1.</span>{' '}
-          Square each:{' '}
-          <span className="text-slate-200">
-            [{squares.map(s => s.toFixed(2)).join(', ')}]
-          </span>
-        </div>
-        <div className="text-slate-400">
-          <span className="text-violet-400 font-semibold">2.</span>{' '}
-          Mean of squares:{' '}
-          <span className="text-slate-200">
-            ({squares.map(s => s.toFixed(2)).join(' + ')}) / 4 ={' '}
-            <span className="text-amber-400">{meanSq.toFixed(4)}</span>
-          </span>
-        </div>
-        <div className="text-slate-400">
-          <span className="text-violet-400 font-semibold">3.</span>{' '}
-          RMS = sqrt(mean + eps) ={' '}
-          <span className="text-amber-400">{rms.toFixed(4)}</span>
-        </div>
-        <div className="text-slate-400">
-          <span className="text-violet-400 font-semibold">4.</span>{' '}
-          Scale = 1 / RMS ={' '}
-          <span className="text-amber-400">{scale.toFixed(4)}</span>
-        </div>
-        <div className="text-slate-400">
-          <span className="text-violet-400 font-semibold">5.</span>{' '}
-          Output:{' '}
-          <span className="text-emerald-400">
-            [{output.map(o => o.toFixed(2)).join(', ')}]
-          </span>
-        </div>
-      </div>
-
-      {/* Bar charts side by side */}
-      <div className="flex gap-4">
-        <BarChart data={values} label="Before (input)" color="#a78bfa" />
-        <BarChart data={output} label="After (normalized)" color="#34d399" />
-      </div>
-
-      <p className="text-slate-400 text-sm mt-4 leading-relaxed">
-        RMSNorm keeps vectors from growing too large or too small. Without it, values would
-        explode or vanish as they pass through many layers.
-      </p>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Residual Connection Diagram                                        */
 /* ------------------------------------------------------------------ */
 function ResidualDiagram() {
@@ -368,9 +235,13 @@ export default function MLP() {
       {/* Section header */}
       <div>
         <h2 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 8: MLP, Activation &amp; Normalization
+          Chapter 10: MLP &amp; Norms
         </h2>
-        <p className="text-slate-400 text-sm">Processing and stabilizing the signal</p>
+        <p className="text-slate-400 text-sm">The thinking stage of the transformer</p>
+        <p className="text-slate-300 leading-relaxed text-sm mt-3">
+          We introduced RMSNorm and softmax in Chapter 7. Now let's see how the MLP combines with these
+          building blocks in the transformer.
+        </p>
       </div>
 
       {/* MLP Explanation */}
@@ -443,9 +314,6 @@ export default function MLP() {
       {/* ReLU Visualization */}
       <ReLUVisualization />
 
-      {/* RMSNorm Visualization */}
-      <RMSNormVisualization />
-
       {/* Residual Connections Diagram */}
       <ResidualDiagram />
 
@@ -476,8 +344,8 @@ export default function MLP() {
 
   const rightContent = (
     <CodePanel
-      pyHighlight={[[97, 106], [135, 141]]}
-      jsHighlight={[[130, 141], [172, 178]]}
+      pyHighlight={[[135, 141]]}
+      jsHighlight={[[172, 178]]}
       title="MLP & Norms"
       blogExcerpt="The MLP block is a feed-forward computation. RMSNorm rescales vectors for stable training. Residual connections enable gradient flow and trainability."
     />

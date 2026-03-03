@@ -108,7 +108,7 @@ export default function Training() {
       {/* Section Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 10: Training
+          Chapter 12: Training
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           Teaching the model through repetition
