@@ -253,7 +253,7 @@ export default function Autograd() {
       {/* Section header */}
       <div>
         <h2 className="text-2xl font-bold text-white tracking-tight">
-          Chapter 3: Autograd Engine
+          Chapter 5: Autograd Engine
         </h2>
         <p className="text-sm text-cyan-400 mt-1 font-medium">
           Teaching the computer to learn from mistakes
@@ -275,6 +275,43 @@ export default function Autograd() {
           Think of it like a <span className="text-emerald-300 font-semibold">trail of breadcrumbs</span>: as we compute
           forward, we leave a trail. Then we follow it backward to distribute blame for the error.
         </p>
+      </div>
+
+      {/* ============================================================ */}
+      {/*  What is a Derivative?                                       */}
+      {/* ============================================================ */}
+      <div className="bg-slate-900/70 rounded-xl border border-slate-700/50 p-4">
+        <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-3">
+          Wait &mdash; What is a Derivative?
+        </h3>
+        <div className="space-y-3 text-sm leading-relaxed text-slate-300">
+          <p>
+            If you have never taken calculus, the word "derivative" might sound intimidating.
+            But the idea is simple:{' '}
+            <span className="text-cyan-300 font-semibold">
+              a derivative tells you: if I nudge this input a tiny bit, how much does the output change?
+            </span>
+          </p>
+          <p>
+            <span className="text-emerald-300 font-semibold">Everyday example:</span>{' '}
+            Imagine you are driving. Your <em>position</em> changes by 60 miles in 1 hour.
+            Your speed &mdash; the derivative of position with respect to time &mdash; is 60 mph.
+            The derivative simply measures the <em className="text-amber-300">rate of change</em>.
+          </p>
+          <p>
+            Now apply this to a neural network: our model has thousands of adjustable numbers
+            (parameters). For <em>each</em> parameter we need to ask:{' '}
+          </p>
+          <blockquote className="border-l-2 border-cyan-500/60 pl-3 my-2 text-cyan-200 italic">
+            "If I nudge this number up a little, does the loss go up or down, and by how much?"
+            <span className="block text-xs text-slate-500 mt-1 not-italic">&mdash; Andrej Karpathy</span>
+          </blockquote>
+          <p>
+            That answer &mdash; for every single parameter &mdash; is what we call the{' '}
+            <em className="text-amber-300">gradient</em>. The computation graph below is the
+            machine that lets us compute all of those answers efficiently, in one backward sweep.
+          </p>
+        </div>
       </div>
 
       {/* ============================================================ */}
@@ -427,6 +464,93 @@ export default function Autograd() {
       </div>
 
       {/* ============================================================ */}
+      {/*  Chain Rule Intuition (car/bicycle/man)                      */}
+      {/* ============================================================ */}
+      <div className="bg-slate-900/70 rounded-xl border border-slate-700/50 p-4">
+        <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-3">
+          The Chain Rule in Plain English
+        </h3>
+        <div className="space-y-3 text-sm leading-relaxed text-slate-300">
+          <p>
+            The "chain rule" in the table above might look like scary math, but it is
+            just multiplication along a path. Here is an analogy from Karpathy's blog:
+          </p>
+          <blockquote className="border-l-2 border-emerald-500/60 pl-3 my-2 text-emerald-200 italic">
+            "If a car travels twice as fast as a bicycle and the bicycle is four times as
+            fast as a walking man, then the car travels 2 &times; 4 = 8 times as fast as the man."
+          </blockquote>
+          <p>
+            The chain rule works the same way: to find how the loss changes when you
+            wiggle an input, <span className="text-cyan-300 font-semibold">multiply the
+            rates of change along the path</span> from that input to the loss. That is
+            literally all it is &mdash; multiplying numbers together along a chain.
+          </p>
+        </div>
+      </div>
+
+      {/* ============================================================ */}
+      {/*  Gradient Accumulation Example                               */}
+      {/* ============================================================ */}
+      <div className="bg-slate-900/70 rounded-xl border border-slate-700/50 p-4">
+        <h3 className="text-sm font-semibold text-rose-400 uppercase tracking-wider mb-3">
+          Why Gradients Accumulate
+        </h3>
+        <div className="space-y-3 text-sm leading-relaxed text-slate-300">
+          <p>
+            Here is a subtle but crucial detail. Consider this tiny program:
+          </p>
+          <pre className="bg-slate-800/80 rounded-lg p-3 text-xs font-mono text-cyan-300 overflow-x-auto">
+{`a = Value(2.0)
+b = Value(3.0)
+c = a * b       # c = 6.0
+L = c + a       # L = 8.0
+L.backward()
+print(a.grad)   # 4.0`}
+          </pre>
+          <p>
+            Why is <code className="text-amber-300 bg-slate-800/50 px-1 rounded">a.grad</code> equal
+            to <span className="text-amber-300 font-bold">4.0</span>? Because{' '}
+            <code className="text-cyan-300">a</code> influences{' '}
+            <code className="text-cyan-300">L</code> through{' '}
+            <span className="text-cyan-300 font-semibold">two separate paths</span>:
+          </p>
+          <div className="bg-slate-800/60 rounded-lg p-3 space-y-2 text-xs font-mono">
+            <div className="flex items-start gap-2">
+              <span className="text-rose-400 font-bold shrink-0">Path 1:</span>
+              <span className="text-slate-300">
+                a &rarr; c (via multiplication with b=3) &rarr; L (via addition) ={' '}
+                <span className="text-amber-300 font-bold">3.0</span>
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-rose-400 font-bold shrink-0">Path 2:</span>
+              <span className="text-slate-300">
+                a &rarr; L (via direct addition) ={' '}
+                <span className="text-amber-300 font-bold">1.0</span>
+              </span>
+            </div>
+            <div className="border-t border-slate-700 pt-2 flex items-start gap-2">
+              <span className="text-emerald-400 font-bold shrink-0">Total:</span>
+              <span className="text-slate-200">
+                3.0 + 1.0 = <span className="text-amber-300 font-bold">4.0</span>
+              </span>
+            </div>
+          </div>
+          <p>
+            This is why in the backpropagation code we
+            use <code className="text-cyan-300 bg-slate-800/50 px-1 rounded">+=</code> instead
+            of <code className="text-slate-400 bg-slate-800/50 px-1 rounded">=</code> when
+            computing gradients:{' '}
+            <span className="text-emerald-300 font-semibold">
+              gradients accumulate from all paths.
+            </span>{' '}
+            If a parameter contributes to the loss through multiple routes, we add up
+            all the contributions.
+          </p>
+        </div>
+      </div>
+
+      {/* ============================================================ */}
       {/*  Key Insight                                                 */}
       {/* ============================================================ */}
       <div className="bg-gradient-to-r from-cyan-950/40 to-rose-950/40 rounded-xl border border-cyan-700/30 p-4">
@@ -436,6 +560,18 @@ export default function Autograd() {
           in microgpt! It walks backward through every operation, applying the chain rule to compute how each parameter
           affects the loss. With <span className="text-amber-300 font-semibold">4,192 parameters</span>, this tells us
           exactly how to adjust each one to reduce the error.
+        </p>
+        <p className="text-sm text-slate-200 leading-relaxed mt-3">
+          <span className="text-amber-300 font-semibold">The wiggle test:</span>{' '}
+          In the accumulation example above, <code className="text-cyan-300 bg-slate-800/50 px-1 rounded">a.grad = 4.0</code> means:
+          if you increase <code className="text-cyan-300">a</code> by 0.001,{' '}
+          <code className="text-cyan-300">L</code> increases by about 0.004.
+          The gradient tells you the{' '}
+          <span className="text-emerald-300 font-semibold">direction</span>{' '}
+          (positive or negative, from the sign) and the{' '}
+          <span className="text-emerald-300 font-semibold">steepness</span>{' '}
+          (how strongly it pulls, from the magnitude) of each parameter's
+          influence on the loss.
         </p>
       </div>
     </div>

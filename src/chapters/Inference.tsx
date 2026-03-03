@@ -144,7 +144,7 @@ export default function Inference() {
       {/* ── Header ──────────────────────────────────────────── */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 8: Inference
+          Chapter 11: Inference
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           The model speaks
@@ -163,6 +163,34 @@ export default function Inference() {
           <li><span className="text-orange-400 font-mono font-bold mr-2">4.</span> Feed the sampled token back in &rarr; get next probabilities</li>
           <li><span className="text-orange-400 font-mono font-bold mr-2">5.</span> Repeat until BOS is generated (end of name) or max length</li>
         </ol>
+      </div>
+
+      {/* ── BOS as Stop Signal ─────────────────────────────── */}
+      <div className="rounded-xl border border-violet-400/30 bg-violet-500/5 p-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-violet-500/20 border border-violet-400/40 flex items-center justify-center">
+            <span className="text-violet-400 text-xs font-bold font-mono">&empty;</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-violet-400 mb-1.5">BOS as the Stop Signal</h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-2">
+              Look at step 5 above: generation stops when the model predicts{' '}
+              <span className="text-violet-300 font-mono font-bold">BOS</span> as the next token.
+              But wait &mdash; isn&apos;t BOS the <em>start</em> token? How can it also mean &ldquo;stop&rdquo;?
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed mb-2">
+              Remember: during training, BOS wraps each name on <span className="text-violet-300 font-semibold">both sides</span>:{' '}
+              <span className="font-mono text-xs text-slate-400">[BOS] e m m a [BOS]</span>.
+              So the model learned that BOS after a sequence of characters means{' '}
+              <span className="text-emerald-400 font-semibold">&ldquo;this name is complete.&rdquo;</span>
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              During inference, predicting BOS is the model&apos;s way of saying{' '}
+              <span className="text-amber-400 font-semibold">&ldquo;I&apos;m done.&rdquo;</span>{' '}
+              In the code: <span className="font-mono text-xs text-violet-300">if token_id == BOS: break</span>.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* ── Autoregressive Loop Diagram (SVG) ───────────────── */}
@@ -223,6 +251,35 @@ export default function Inference() {
           <line x1={60} y1={48} x2={30} y2={25} stroke="#34d399" strokeWidth={1.5} markerEnd="url(#arrowOrange)" />
           <text x={15} y={18} fill="#34d399" fontSize={10} fontWeight={600} fontFamily="monospace">output</text>
         </svg>
+      </div>
+
+      {/* ── KV Cache Explanation ────────────────────────────── */}
+      <div className="rounded-xl border border-indigo-400/30 bg-indigo-500/5 p-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center">
+            <span className="text-indigo-400 text-xs font-bold">K</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-indigo-400 mb-1.5">Why the KV Cache?</h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-2">
+              Look at the code: the model initializes{' '}
+              <span className="font-mono text-indigo-300 text-xs">keys, values = [[] for _ in range(n_layer)]</span>{' '}
+              before each name. What is this for?
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed mb-2">
+              During inference, the model processes <span className="text-indigo-300 font-semibold">one token at a time</span>.
+              The KV cache stores the <span className="text-cyan-400 font-medium">key</span> and{' '}
+              <span className="text-emerald-400 font-medium">value</span> vectors from all previously generated tokens.
+              When generating each new token, the model only needs to compute Q, K, V for the{' '}
+              <span className="text-amber-400 font-medium">new token</span>, then attend to the cached K and V from all previous positions.
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Without the cache, we&apos;d have to <span className="text-rose-400 font-semibold">re-run the entire sequence</span> through
+              the model for every single new token. For a 5-character name, that&apos;s fine. For GPT-4 generating thousands of tokens,
+              the cache is what makes generation fast enough to be practical.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* ── Temperature Visualization (KEY INTERACTIVE) ─────── */}
@@ -316,6 +373,35 @@ export default function Inference() {
           <p className="text-xs text-slate-400">
             Effect: <span className="text-cyan-400 font-medium">{tempEffect}</span>
           </p>
+        </div>
+
+        {/* Temperature math explanation */}
+        <div className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-500/5 p-4">
+          <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
+            How Temperature Actually Works
+          </h3>
+          <div className="space-y-2 text-xs text-slate-300 leading-relaxed">
+            <p>
+              Before softmax, each logit is <span className="text-emerald-300 font-semibold">divided</span> by temperature T:
+            </p>
+            <p className="font-mono text-center text-emerald-400 bg-slate-900/60 rounded px-3 py-2">
+              probs = softmax(logits / T)
+            </p>
+            <p>
+              When <span className="text-cyan-400 font-mono font-bold">T &lt; 1</span>, dividing makes the logits <span className="text-cyan-300 font-semibold">larger</span>.
+              For example, <span className="font-mono text-slate-400">[2, 1, 0] / 0.5 = [4, 2, 0]</span>.
+              The gaps between logits grow, so softmax produces a <span className="text-cyan-300 font-semibold">more peaked</span> distribution &mdash; the top choice dominates.
+            </p>
+            <p>
+              When <span className="text-amber-400 font-mono font-bold">T &gt; 1</span>, dividing makes the logits <span className="text-amber-300 font-semibold">smaller</span>.
+              For example, <span className="font-mono text-slate-400">[2, 1, 0] / 2 = [1, 0.5, 0]</span>.
+              The gaps shrink, so softmax produces a <span className="text-amber-300 font-semibold">flatter, more uniform</span> distribution.
+            </p>
+            <p>
+              <span className="text-emerald-400 font-mono font-bold">T = 1.0</span> gives the model&apos;s raw learned distribution, unchanged.
+              As <span className="font-mono text-slate-400">T &rarr; 0</span>, it approaches <span className="text-violet-400 font-medium">greedy decoding</span> &mdash; always picking the single most likely token.
+            </p>
+          </div>
         </div>
       </div>
 

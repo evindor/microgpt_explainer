@@ -404,7 +404,7 @@ export default function MLP() {
       {/* Section header */}
       <div>
         <h2 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 6: MLP, Activation &amp; Normalization
+          Chapter 8: MLP, Activation &amp; Normalization
         </h2>
         <p className="text-slate-400 text-sm">Processing and stabilizing the signal</p>
       </div>

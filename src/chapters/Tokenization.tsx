@@ -74,7 +74,7 @@ export default function Tokenization() {
       {/* Section Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 1: Tokenization
+          Chapter 2: Tokenization
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           Teaching computers to read
@@ -91,8 +91,68 @@ export default function Tokenization() {
           In microgpt, each unique character gets its own ID. The 26 letters{' '}
           <code className="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">a-z</code> become
           IDs <code className="text-amber-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">0-25</code>, and
-          a special <span className="text-violet-400 font-medium">BOS</span> (Beginning of Sequence) token is
+          a special <span className="text-violet-400 font-medium">BOS</span> token is
           ID <code className="text-violet-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">26</code>.
+        </p>
+        <p className="text-slate-300 leading-relaxed text-sm">
+          BOS stands for "Beginning of Sequence," but in microgpt it serves{' '}
+          <span className="text-violet-400 font-medium">double duty</span>: it marks both the{' '}
+          <span className="text-cyan-400 font-medium">beginning</span> and the{' '}
+          <span className="text-rose-400 font-medium">end</span> of each name. The name "emma" becomes{' '}
+          <code className="text-violet-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">[BOS, e, m, m, a, BOS]</code>.
+        </p>
+        <p className="text-slate-300 leading-relaxed text-sm">
+          Why both ends? When the model sees BOS at the start, it learns{' '}
+          <span className="text-cyan-400 font-medium">"a new name is starting."</span>{' '}
+          When it predicts BOS as the next token, it means{' '}
+          <span className="text-rose-400 font-medium">"I'm done with this name."</span>{' '}
+          One token, two roles.
+        </p>
+      </div>
+
+      {/* BOS Wrapping Visual */}
+      <div className="viz-card glow-violet">
+        <h2 className="text-sm font-semibold text-violet-400 uppercase tracking-wider mb-3">
+          BOS: One Token, Two Roles
+        </h2>
+        <div className="flex items-center justify-center gap-1">
+          {/* Leading BOS */}
+          <div className="flex flex-col items-center">
+            <div className="rounded-lg border border-violet-400/60 bg-violet-500/20 px-3 py-2 min-w-[48px] text-center">
+              <span className="text-sm font-bold font-mono text-violet-300">[BOS]</span>
+              <div className="text-[10px] text-slate-400 mt-0.5 font-mono">26</div>
+            </div>
+            <span className="text-[10px] text-cyan-400 font-semibold mt-1 uppercase tracking-wide">start</span>
+          </div>
+          {/* Arrow */}
+          <span className="text-slate-600 text-xs mx-0.5">&mdash;</span>
+          {/* Letters */}
+          {['e', 'm', 'm', 'a'].map((ch, i) => {
+            const id = charToId(ch);
+            const color = tokenColor(id);
+            return (
+              <div key={`bos-demo-${i}`} className="flex flex-col items-center">
+                <div className={`rounded-lg border px-3 py-2 min-w-[48px] text-center ${color.bg} ${color.border}`}>
+                  <span className={`text-sm font-bold font-mono ${color.text}`}>{ch}</span>
+                  <div className="text-[10px] text-slate-400 mt-0.5 font-mono">{id}</div>
+                </div>
+                <span className="text-[10px] text-transparent mt-1">&nbsp;</span>
+              </div>
+            );
+          })}
+          {/* Arrow */}
+          <span className="text-slate-600 text-xs mx-0.5">&mdash;</span>
+          {/* Trailing BOS */}
+          <div className="flex flex-col items-center">
+            <div className="rounded-lg border border-violet-400/60 bg-violet-500/20 px-3 py-2 min-w-[48px] text-center">
+              <span className="text-sm font-bold font-mono text-violet-300">[BOS]</span>
+              <div className="text-[10px] text-slate-400 mt-0.5 font-mono">26</div>
+            </div>
+            <span className="text-[10px] text-rose-400 font-semibold mt-1 uppercase tracking-wide">stop</span>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400 text-center mt-3">
+          "emma" &rarr; [26, 4, 12, 12, 0, 26]
         </p>
       </div>
 
@@ -115,6 +175,8 @@ export default function Tokenization() {
         <div className="mt-4 flex flex-wrap gap-2 min-h-[60px] items-start">
           {tokens.map((tok, i) => {
             const color = tokenColor(tok.id);
+            const isLeadingBOS = tok.char === 'BOS' && i === 0;
+            const isTrailingBOS = tok.char === 'BOS' && i === tokens.length - 1;
             return (
               <div
                 key={`${i}-${tok.char}-${tok.id}`}
@@ -129,6 +191,12 @@ export default function Tokenization() {
                 <span className="text-[10px] text-slate-400 mt-0.5 font-mono">
                   {tok.id}
                 </span>
+                {isLeadingBOS && (
+                  <span className="text-[9px] text-cyan-400 font-semibold mt-0.5 uppercase tracking-wide">start</span>
+                )}
+                {isTrailingBOS && (
+                  <span className="text-[9px] text-rose-400 font-semibold mt-0.5 uppercase tracking-wide">stop</span>
+                )}
               </div>
             );
           })}

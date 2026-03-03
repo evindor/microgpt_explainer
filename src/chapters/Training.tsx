@@ -148,7 +148,7 @@ export default function Training() {
       {/* Section Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-100 mb-1">
-          Chapter 7: Training
+          Chapter 10: Training
         </h1>
         <p className="text-sm text-slate-400 tracking-wide">
           Teaching the model through repetition
@@ -272,6 +272,47 @@ export default function Training() {
           </div>
         </div>
 
+        {/* Why Cross-Entropy? */}
+        <div className="mt-4 rounded-lg border border-amber-400/20 bg-amber-500/5 p-4 space-y-3">
+          <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+            But why cross-entropy? Why not something simpler?
+          </h3>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            You might wonder: why use <code className="text-amber-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">-log(P)</code> instead
+            of something simpler like <code className="text-slate-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">1 - P</code>? The
+            answer comes down to <span className="text-amber-400 font-medium">surprise</span>.
+          </p>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            The blog puts it well: the loss measures <em className="text-slate-200">&quot;how surprised the model is by what actually comes next.&quot;</em> Cross-entropy
+            is the mathematically natural way to measure surprise for probability distributions:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+            <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-lg p-3">
+              <p className="text-xs text-emerald-400 font-semibold mb-1">P = 1.0</p>
+              <p className="text-xs text-slate-300 font-mono">-log(1) = <span className="text-emerald-400 font-bold">0</span></p>
+              <p className="text-[10px] text-slate-500 mt-1">Not surprised at all</p>
+            </div>
+            <div className="bg-amber-500/10 border border-amber-400/20 rounded-lg p-3">
+              <p className="text-xs text-amber-400 font-semibold mb-1">P = 0.5</p>
+              <p className="text-xs text-slate-300 font-mono">-log(0.5) = <span className="text-amber-400 font-bold">0.69</span></p>
+              <p className="text-[10px] text-slate-500 mt-1">Coin flip &mdash; mildly surprised</p>
+            </div>
+            <div className="bg-rose-500/10 border border-rose-400/20 rounded-lg p-3">
+              <p className="text-xs text-rose-400 font-semibold mb-1">P &rarr; 0</p>
+              <p className="text-xs text-slate-300 font-mono">-log(P) &rarr; <span className="text-rose-400 font-bold">&infin;</span></p>
+              <p className="text-[10px] text-slate-500 mt-1">Extremely surprised</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            The key property: <span className="text-amber-400 font-medium">confident wrong answers are punished exponentially more
+            than uncertain ones</span>. If the model puts 90% on the wrong letter, it gets hammered.
+            A simple metric like <code className="text-slate-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">1 - P</code> would
+            only give a loss of 0.9 vs 1.0 &mdash; barely a difference. But{' '}
+            <code className="text-amber-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">-log(P)</code> gives 2.30 vs 4.61 &mdash;
+            a huge penalty for being confidently wrong. This forces the model to be honest about its uncertainty.
+          </p>
+        </div>
+
         {/* SVG loss curve */}
         <div className="mt-4">
           <h3 className="text-xs font-semibold text-slate-400 mb-2">
@@ -373,6 +414,28 @@ export default function Training() {
           Over 1000 training steps, the loss decreases from random guessing to a model that
           predicts plausible next characters.
         </p>
+
+        {/* Random baseline derivation */}
+        <div className="mb-4 rounded-lg border border-cyan-400/20 bg-cyan-500/5 p-3.5 space-y-2">
+          <h3 className="text-xs font-semibold text-cyan-400">
+            Where does the starting loss of ~3.3 come from?
+          </h3>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            At the start of training, the model&apos;s weights are random. It has no idea which letter
+            comes next, so it assigns roughly <span className="text-cyan-400 font-medium">equal probability to all 27 tokens</span> (a&ndash;z
+            plus the special BOS token).
+          </p>
+          <div className="bg-slate-900/60 rounded-lg p-3 font-mono text-xs text-slate-300 space-y-1">
+            <p>Each token gets probability &asymp; <span className="text-cyan-400">1/27</span></p>
+            <p>Loss = -log(<span className="text-cyan-400">1/27</span>) = log(<span className="text-cyan-400">27</span>) &asymp; <span className="text-amber-400 font-bold">3.30</span></p>
+          </div>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            This is the <span className="text-cyan-400 font-medium">random guessing baseline</span>. Any loss
+            below 3.3 means the model is doing better than random chance &mdash; it has started to
+            learn patterns in the names.
+          </p>
+        </div>
+
         <div className="bg-slate-900/60 rounded-lg p-4 relative">
           {/* Annotations */}
           <div className="absolute top-6 left-16 text-[10px] text-slate-400 bg-slate-800/80 px-2 py-1 rounded border border-slate-700/50 z-10">
@@ -458,6 +521,73 @@ export default function Training() {
                 steps early, small steps later
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Detailed Adam component breakdowns */}
+        <div className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-500/5 p-4 space-y-3">
+          <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+            Under the hood: what each part of Adam does
+          </h3>
+
+          {/* Momentum (m) */}
+          <div className="bg-slate-900/50 rounded-lg p-3 border-l-2 border-emerald-400/40">
+            <p className="text-xs text-emerald-400 font-semibold mb-1">
+              Momentum (m) &mdash; <code className="text-slate-300 bg-slate-800 px-1 py-0.5 rounded font-mono">m = &beta;1 * m + (1-&beta;1) * grad</code>
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Tracks the <span className="text-emerald-400 font-medium">running average of recent gradients</span>. Think of
+              it like a rolling ball &mdash; it doesn&apos;t change direction instantly every time it hits a bump.
+              If the gradient keeps pointing the same way, momentum builds up and the ball rolls faster.
+              If the gradient is noisy and keeps flipping direction, the ball slows down.
+              This smooths out the jittery noise that comes from training on one name at a time.
+            </p>
+          </div>
+
+          {/* Velocity (v) */}
+          <div className="bg-slate-900/50 rounded-lg p-3 border-l-2 border-cyan-400/40">
+            <p className="text-xs text-cyan-400 font-semibold mb-1">
+              Velocity (v) &mdash; <code className="text-slate-300 bg-slate-800 px-1 py-0.5 rounded font-mono">v = &beta;2 * v + (1-&beta;2) * grad&sup2;</code>
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Tracks the <span className="text-cyan-400 font-medium">running average of recent squared gradients</span>. This
+              measures how <em>big</em> the gradients have been for each parameter. Parameters with
+              consistently large gradients get <span className="text-cyan-400 font-medium">smaller effective
+              learning rates</span> &mdash; they&apos;re already moving fast enough. Parameters with small
+              gradients get <span className="text-cyan-400 font-medium">larger effective steps</span> &mdash;
+              they need a boost to catch up. This per-parameter adaptation is what makes Adam so
+              effective compared to simple gradient descent.
+            </p>
+          </div>
+
+          {/* Bias correction */}
+          <div className="bg-slate-900/50 rounded-lg p-3 border-l-2 border-amber-400/40">
+            <p className="text-xs text-amber-400 font-semibold mb-1">
+              Bias Correction &mdash; <code className="text-slate-300 bg-slate-800 px-1 py-0.5 rounded font-mono">m&#x302; = m / (1 - &beta;1<sup>t</sup>)</code>
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Both <code className="text-emerald-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">m</code> and{' '}
+              <code className="text-cyan-400 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">v</code> start at zero.
+              That means in the first few steps, they&apos;re <span className="text-amber-400 font-medium">biased toward
+              zero</span> &mdash; they haven&apos;t accumulated enough history yet. The correction
+              divides by <code className="text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-xs font-mono">(1 - &beta;<sup>t</sup>)</code> to
+              compensate, which is especially important in the first few training steps when the
+              averages are far from their true values.
+            </p>
+          </div>
+
+          {/* Learning rate decay */}
+          <div className="bg-slate-900/50 rounded-lg p-3 border-l-2 border-violet-400/40">
+            <p className="text-xs text-violet-400 font-semibold mb-1">
+              Learning Rate Decay &mdash; <code className="text-slate-300 bg-slate-800 px-1 py-0.5 rounded font-mono">lr_t = lr * (1 - step/num_steps)</code>
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Start with <span className="text-violet-400 font-medium">large steps for fast initial progress</span>, then
+              gradually shrink the learning rate as training continues. Early on, the parameters are
+              far from good values, so big steps make sense. Later, we&apos;re fine-tuning near a good
+              solution and big steps would overshoot. By step 1000, the learning rate reaches zero &mdash;
+              like easing off the gas as you approach your parking spot.
+            </p>
           </div>
         </div>
 

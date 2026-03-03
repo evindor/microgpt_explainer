@@ -483,7 +483,7 @@ export default function Attention() {
       {/* ---- Section Header ---- */}
       <div>
         <h1 className="text-3xl font-bold text-slate-100 tracking-tight">
-          Chapter 5: <span className="text-amber-400">Attention</span>
+          Chapter 7: <span className="text-amber-400">Attention</span>
         </h1>
         <p className="text-slate-400 mt-1 text-lg">How tokens talk to each other</p>
       </div>
@@ -535,6 +535,96 @@ export default function Attention() {
         </div>
       </section>
 
+      {/* ---- "emma" Concrete Example ---- */}
+      <section>
+        <h2 className="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
+          <span className="text-amber-400">&#9632;</span> Concrete Example: "emma"
+        </h2>
+        <p className="text-sm text-slate-400 mb-3 leading-relaxed">
+          Let's walk through a concrete scenario from the blog post to see Q, K, V in action.
+        </p>
+        <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-4 space-y-4">
+          {/* Token positions */}
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 font-semibold">Token positions for "emma"</p>
+            <div className="flex gap-1.5 items-end">
+              {[
+                { pos: 0, tok: 'BOS', highlight: false },
+                { pos: 1, tok: 'e', highlight: true },
+                { pos: 2, tok: 'm', highlight: false },
+                { pos: 3, tok: 'm', highlight: true },
+                { pos: 4, tok: 'a', highlight: false },
+              ].map(({ pos, tok, highlight }) => (
+                <div key={pos} className="flex flex-col items-center gap-1">
+                  <span className="text-[10px] text-slate-600">pos {pos}</span>
+                  <div
+                    className={`w-12 h-12 rounded flex items-center justify-center font-mono text-sm font-bold border ${
+                      highlight
+                        ? pos === 3
+                          ? 'bg-red-900/40 border-red-500/60 text-red-300 ring-2 ring-red-500/30'
+                          : 'bg-blue-900/40 border-blue-500/60 text-blue-300 ring-2 ring-blue-500/30'
+                        : 'bg-slate-700/60 border-slate-600/40 text-slate-400'
+                    }`}
+                  >
+                    {tok}
+                  </div>
+                  {pos === 3 && (
+                    <span className="text-[9px] text-red-400 font-semibold mt-0.5">QUERY</span>
+                  )}
+                  {pos === 1 && (
+                    <span className="text-[9px] text-blue-400 font-semibold mt-0.5">KEY match!</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Scenario explanation */}
+          <div className="bg-slate-900/50 rounded-lg p-3 space-y-2">
+            <p className="text-sm text-slate-300 leading-relaxed">
+              The model is at <span className="text-red-400 font-mono font-semibold">position 3</span> (the second{' '}
+              <span className="text-red-300 font-mono">"m"</span>) and needs to predict the next character.
+            </p>
+            <div className="space-y-1.5 text-sm">
+              <p className="text-slate-300">
+                <span className="font-semibold text-red-400">Q</span> at position 3 asks:{' '}
+                <span className="italic text-red-300">"What vowels appeared recently?"</span>
+              </p>
+              <p className="text-slate-300">
+                <span className="font-semibold text-blue-400">K</span> at position 1 (<span className="font-mono text-blue-300">"e"</span>) answers:{' '}
+                <span className="italic text-blue-300">"I'm a vowel!"</span>
+                {' '}&mdash; this matches the query well!
+              </p>
+              <p className="text-slate-300">
+                <span className="font-semibold text-green-400">V</span> at position 1 provides:{' '}
+                <span className="italic text-green-300">"Here's my information about being a vowel."</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Arrow showing flow */}
+          <div className="flex items-center justify-center gap-2">
+            <div className="px-2.5 py-1 bg-blue-900/30 border border-blue-700/30 rounded text-xs text-blue-300 font-mono">
+              V from "e"
+            </div>
+            <svg width="40" height="20" viewBox="0 0 40 20" className="text-amber-500">
+              <path d="M0 10 H32 M28 6 L34 10 L28 14" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+            <div className="px-2.5 py-1 bg-red-900/30 border border-red-700/30 rounded text-xs text-red-300 font-mono">
+              position 3
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Because the Q/K match is strong, <span className="font-mono text-blue-300">"e"</span> gets a{' '}
+            <span className="text-amber-400 font-semibold">high attention weight</span>, and its value (information about
+            being a vowel) <span className="text-amber-400">flows into position 3</span>. This helps the model
+            predict that <span className="font-mono text-amber-300">"a"</span> (another vowel) is likely next, since names
+            like "emma" often follow consonant clusters with a vowel.
+          </p>
+        </div>
+      </section>
+
       {/* ---- Attention Heatmap ---- */}
       <section>
         <h2 className="text-lg font-semibold text-slate-200 mb-1 flex items-center gap-2">
@@ -555,6 +645,95 @@ export default function Attention() {
         <AttentionFlowDiagram />
       </section>
 
+      {/* ---- Why divide by sqrt(d)? ---- */}
+      <section>
+        <h2 className="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
+          <span className="text-amber-400">&#9632;</span> Why Divide by &radic;d?
+        </h2>
+        <p className="text-sm text-slate-400 mb-3 leading-relaxed">
+          In Step 2 above, you saw the formula{' '}
+          <span className="font-mono text-amber-300">Score = Q &middot; K / &radic;d</span>. Why the{' '}
+          <span className="font-mono text-amber-300">&radic;d</span>? It's more important than it looks.
+        </p>
+        <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-4 space-y-4">
+          {/* The problem */}
+          <div>
+            <h4 className="text-sm font-semibold text-slate-200 mb-2">The problem without scaling</h4>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              The dot product <span className="font-mono text-slate-200">Q &middot; K</span> adds up{' '}
+              <span className="font-mono text-amber-300">d</span> multiplied pairs. As <span className="font-mono text-amber-300">d</span> gets
+              larger, this sum naturally grows larger too. In microgpt,{' '}
+              <span className="font-mono text-amber-300">head_dim = 4</span>, which is tiny. But imagine
+              <span className="font-mono text-amber-300"> d = 128</span> (common in real models) &mdash; dot products could
+              balloon to huge numbers.
+            </p>
+          </div>
+
+          {/* Visual comparison */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Without scaling */}
+            <div className="bg-red-900/15 border border-red-800/30 rounded-lg p-3">
+              <p className="text-xs font-semibold text-red-400 mb-2">WITHOUT &radic;d scaling</p>
+              <p className="text-xs text-slate-400 mb-2">Raw scores might be:</p>
+              <div className="flex gap-1 mb-2">
+                {['-1.2', '0.5', '12.8', '-0.3'].map((s, i) => (
+                  <div key={i} className="px-1.5 py-1 bg-slate-800 rounded text-[10px] font-mono text-slate-300">{s}</div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400 mb-1">After softmax:</p>
+              <div className="flex gap-1">
+                {['0.00', '0.00', '1.00', '0.00'].map((s, i) => (
+                  <div key={i} className={`px-1.5 py-1 rounded text-[10px] font-mono font-semibold ${
+                    s === '1.00'
+                      ? 'bg-red-500/40 text-red-200'
+                      : 'bg-slate-800 text-slate-600'
+                  }`}>{s}</div>
+                ))}
+              </div>
+              <p className="text-[10px] text-red-400 mt-2 leading-snug">
+                Nearly one-hot! One position gets ~100%, all others ~0%.
+                Gradients become tiny. Learning stalls.
+              </p>
+            </div>
+
+            {/* With scaling */}
+            <div className="bg-green-900/15 border border-green-800/30 rounded-lg p-3">
+              <p className="text-xs font-semibold text-green-400 mb-2">WITH &radic;d scaling</p>
+              <p className="text-xs text-slate-400 mb-2">Scaled scores (÷ &radic;d):</p>
+              <div className="flex gap-1 mb-2">
+                {['-0.6', '0.3', '1.1', '-0.2'].map((s, i) => (
+                  <div key={i} className="px-1.5 py-1 bg-slate-800 rounded text-[10px] font-mono text-slate-300">{s}</div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400 mb-1">After softmax:</p>
+              <div className="flex gap-1">
+                {['0.11', '0.27', '0.42', '0.20'].map((s, i) => (
+                  <div key={i} className={`px-1.5 py-1 rounded text-[10px] font-mono font-semibold`}
+                       style={{
+                         backgroundColor: `rgba(34, 197, 94, ${parseFloat(s) * 0.8 + 0.08})`,
+                         color: parseFloat(s) > 0.35 ? '#1e293b' : '#bbf7d0',
+                       }}>{s}</div>
+                ))}
+              </div>
+              <p className="text-[10px] text-green-400 mt-2 leading-snug">
+                Smooth distribution. Multiple positions contribute.
+                Gradients are healthy. Learning proceeds normally.
+              </p>
+            </div>
+          </div>
+
+          {/* Microgpt concrete numbers */}
+          <div className="bg-slate-900/50 rounded p-3">
+            <p className="text-xs text-slate-300 leading-relaxed">
+              In microgpt, <span className="font-mono text-amber-300">head_dim = 4</span>, so{' '}
+              <span className="font-mono text-amber-300">&radic;d = &radic;4 = 2</span>.
+              Every raw dot product gets divided by 2 before going into softmax.
+              Simple, but it keeps training stable even at larger scales.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ---- Multi-Head Attention ---- */}
       <section>
         <h2 className="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
@@ -570,6 +749,77 @@ export default function Attention() {
           another on position, another on repeated characters, etc.
         </p>
         <MultiHeadDiagram />
+      </section>
+
+      {/* ---- KV Cache ---- */}
+      <section>
+        <h2 className="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
+          <span className="text-amber-400">&#9632;</span> The KV Cache
+        </h2>
+        <p className="text-sm text-slate-400 mb-3 leading-relaxed">
+          Look at lines 8-9 in the code: <span className="font-mono text-amber-300">keys[li].append(k)</span> and{' '}
+          <span className="font-mono text-amber-300">values[li].append(v)</span>. What's going on there?
+        </p>
+        <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-4 space-y-4">
+          {/* Visual: token-by-token cache building */}
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 font-semibold">Cache grows with each token</p>
+            <div className="space-y-2">
+              {[
+                { pos: 0, tok: 'BOS', cached: ['BOS'] },
+                { pos: 1, tok: 'e', cached: ['BOS', 'e'] },
+                { pos: 2, tok: 'm', cached: ['BOS', 'e', 'm'] },
+                { pos: 3, tok: 'm', cached: ['BOS', 'e', 'm', 'm'] },
+              ].map(({ pos, tok, cached }) => (
+                <div key={pos} className="flex items-center gap-2">
+                  <div className="w-20 flex items-center justify-end gap-1.5">
+                    <span className="text-[10px] text-slate-600">pos {pos}:</span>
+                    <span className="font-mono text-xs text-amber-300 font-semibold">"{tok}"</span>
+                  </div>
+                  <svg width="24" height="16" viewBox="0 0 24 16" className="text-slate-600 flex-shrink-0">
+                    <path d="M0 8 H18 M14 4 L20 8 L14 12" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                  </svg>
+                  <div className="flex items-center gap-0.5">
+                    <span className="text-[10px] text-slate-600 mr-1">KV cache:</span>
+                    {cached.map((c, i) => (
+                      <div key={i} className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                        i === cached.length - 1
+                          ? 'bg-amber-500/25 border border-amber-500/40 text-amber-300 font-semibold'
+                          : 'bg-slate-700/50 border border-slate-600/30 text-slate-400'
+                      }`}>
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Why it matters */}
+          <div className="bg-slate-900/50 rounded-lg p-3 space-y-2">
+            <p className="text-sm text-slate-300 leading-relaxed">
+              <span className="font-semibold text-amber-300">Why cache?</span> When the model processes position 3
+              (the second <span className="font-mono">"m"</span>), it needs to compute attention against
+              positions 0, 1, and 2. Instead of re-running the entire sequence from scratch,
+              it just looks up the keys and values it already computed and stored.
+            </p>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              <span className="font-semibold text-amber-300">During inference</span> (generating text one token at a time),
+              this is essential for speed: the model processes just the <em className="text-amber-300 not-italic">new</em> token
+              and retrieves everything it needs about past tokens from the cache. Without the KV cache,
+              generating each new token would require re-processing the entire sequence from the beginning.
+            </p>
+          </div>
+
+          {/* Note about microgpt */}
+          <p className="text-xs text-slate-500 leading-relaxed">
+            <span className="font-semibold text-slate-400">A note on microgpt:</span> Unlike typical implementations
+            where the KV cache is only used during inference, microgpt uses it during training too. That's
+            because microgpt processes tokens one at a time (no parallel processing).
+            In production models, the same concept is hidden inside the vectorized attention computation.
+          </p>
+        </div>
       </section>
 
       {/* ---- Key Insight ---- */}
