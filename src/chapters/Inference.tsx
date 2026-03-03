@@ -583,44 +583,11 @@ export default function Inference() {
   );
 
   /* ── RIGHT CONTENT ───────────────────────────────────────── */
-  const codeString = `# Inference: generate new names!
-temperature = 0.5  # controls randomness
-
-for sample_idx in range(20):
-    # Fresh KV cache for each sample
-    keys = [[] for _ in range(n_layer)]
-    values = [[] for _ in range(n_layer)]
-
-    token_id = BOS  # start with beginning-of-sequence
-    sample = []
-
-    for pos_id in range(block_size):
-        # Forward pass (same model, now frozen)
-        logits = gpt(token_id, pos_id, keys, values)
-
-        # Apply temperature scaling
-        # Low temp → confident, high temp → random
-        probs = softmax([l / temperature for l in logits])
-
-        # Sample next token from distribution
-        token_id = random.choices(
-            range(vocab_size),
-            weights=[p.data for p in probs]
-        )[0]
-
-        # If we generated BOS, the name is complete
-        if token_id == BOS:
-            break
-
-        sample.append(uchars[token_id])
-
-    print(f"sample: {''.join(sample)}")
-    # Output: kamon, ann, karai, vialan, anna, keylen, ...`;
-
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py — Inference"
+      pyHighlight={[[186, 201]]}
+      jsHighlight={[[227, 243]]}
+      title="Inference"
       blogExcerpt="Temperature parameter controls randomness: lower values pick top choices, higher values produce more diverse but less coherent output."
     />
   );

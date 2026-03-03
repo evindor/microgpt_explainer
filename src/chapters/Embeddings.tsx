@@ -335,40 +335,11 @@ export default function Embeddings() {
   );
 
   /* ── RIGHT CONTENT ─────────────────────────────────────────── */
-  const code = `# Initialize embeddings (random small values)
-n_embd = 16      # embedding dimension (vector size)
-block_size = 16   # max sequence length
-
-matrix = lambda nout, nin, std=0.08: [
-    [Value(random.gauss(0, std)) for _ in range(nin)]
-    for _ in range(nout)
-]
-
-state_dict = {
-    # Token embedding: 27 tokens × 16 dimensions
-    'wte': matrix(vocab_size, n_embd),
-    # Position embedding: 16 positions × 16 dimensions
-    'wpe': matrix(block_size, n_embd),
-    ...
-}
-
-# Inside the GPT function:
-def gpt(token_id, pos_id, keys, values):
-    # Look up embeddings (just indexing into the table!)
-    tok_emb = state_dict['wte'][token_id]
-    pos_emb = state_dict['wpe'][pos_id]
-
-    # Combine: element-wise addition
-    x = [t + p for t, p in zip(tok_emb, pos_emb)]
-
-    # x is now a vector of 16 Values
-    # It encodes BOTH what the token is AND where it is
-    ...`;
-
   const rightContent = (
     <CodePanel
-      code={code}
-      title="microgpt.py — Embeddings"
+      pyHighlight={[[74, 81], [108, 112]]}
+      jsHighlight={[[104, 112], [143, 147]]}
+      title="Embeddings"
       blogExcerpt="Token and position embeddings combined into input representation"
     />
   );

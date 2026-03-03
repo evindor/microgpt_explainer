@@ -416,38 +416,11 @@ export default function VectorsMatrices() {
     </div>
   );
 
-  const codeString = `# The fundamental building block: matrix-vector multiply
-# This single function does most of the "work" in a GPT
-
-def linear(x, w):
-    # x is a vector (list of numbers)
-    # w is a matrix (list of lists)
-    # returns: w @ x (matrix-vector product)
-    return [
-        sum(wi * xi for wi, xi in zip(wo, x))
-        for wo in w
-    ]
-
-# What happens inside linear(x, w):
-#
-# For each row in w:
-#   Take the dot product with x
-#   That gives one output number
-#
-# Example:
-# w = [[2, 1, 0],    x = [1,     result = [2*1+1*2+0*3,  = [4,
-#      [0, 3, 1],         2,               0*1+3*2+1*3,     9,
-#      [1, 0, 2]]         3]               1*1+0*2+2*3]     7]
-#
-# This is used EVERYWHERE in the GPT:
-# - Computing Q, K, V in attention
-# - The MLP layers
-# - The final output projection`;
-
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py — Linear Algebra"
+      pyHighlight={[[80, 80], [94, 95]]}
+      jsHighlight={[[100, 102], [110, 111], [126, 128]]}
+      title="Linear Algebra"
       blogExcerpt="linear: Matrix-vector multiplication—the fundamental building block"
     />
   );

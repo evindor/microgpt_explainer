@@ -35,60 +35,28 @@ const stages: StageInfo[] = [
   { name: 'Output Logits',        description: 'linear(x, lm_head) \u2192 27 scores \u2192 softmax',       borderColor: 'border-cyan-400',   bgGlow: 'shadow-cyan-400/30',   category: 'data' },
 ];
 
-const CODE = `def gpt(token_id, pos_id, keys, values):
-    # Step 1-2: Look up embeddings
-    tok_emb = state_dict['wte'][token_id]
-    pos_emb = state_dict['wpe'][pos_id]
+const PY_STEP_HIGHLIGHTS: Record<number, [number, number][]> = {
+  0: [[108, 108]],
+  1: [[109, 109]],
+  2: [[110, 110]],
+  3: [[111, 111]],
+  4: [[112, 112]],
+  5: [[115, 132]],
+  6: [[133, 134]],
+  7: [[135, 141]],
+  8: [[143, 144]],
+};
 
-    # Step 3: Combine embeddings
-    x = [t + p for t, p in zip(tok_emb, pos_emb)]
-    x = rmsnorm(x)  # Step 4: Normalize
-
-    for li in range(n_layer):
-        # === Attention Block ===
-        x_residual = x
-        x = rmsnorm(x)
-
-        # Step 5: Compute Q, K, V
-        q = linear(x, state_dict[f'layer{li}.attn_wq'])
-        k = linear(x, state_dict[f'layer{li}.attn_wk'])
-        v = linear(x, state_dict[f'layer{li}.attn_wv'])
-        keys[li].append(k)
-        values[li].append(v)
-
-        # Multi-head attention
-        x_attn = []
-        for h in range(n_head):
-            # ... Q\\u00B7K attention scores ...
-            # ... softmax \\u2192 weights ...
-            # ... weighted sum of V ...
-            x_attn.extend(head_out)
-
-        x = linear(x_attn, state_dict[f'layer{li}.attn_wo'])
-        x = [a + b for a, b in zip(x, x_residual)]  # Step 6
-
-        # === MLP Block ===
-        x_residual = x
-        x = rmsnorm(x)
-        x = linear(x, state_dict[f'layer{li}.mlp_fc1'])  # 16\\u219264
-        x = [xi.relu() for xi in x]                       # ReLU
-        x = linear(x, state_dict[f'layer{li}.mlp_fc2'])  # 64\\u219216
-        x = [a + b for a, b in zip(x, x_residual)]  # Step 7
-
-    # Step 8: Output logits
-    logits = linear(x, state_dict['lm_head'])
-    return logits  # 27 scores, one per possible next token`;
-
-const STEP_HIGHLIGHT_LINES: Record<number, number[]> = {
-  0: [1],
-  1: [2, 3],
-  2: [4],
-  3: [7],
-  4: [8],
-  5: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
-  6: [30, 31],
-  7: [34, 35, 36, 37, 38],
-  8: [41, 42],
+const JS_STEP_HIGHLIGHTS: Record<number, [number, number][]> = {
+  0: [[143, 143]],
+  1: [[144, 144]],
+  2: [[145, 145]],
+  3: [[146, 146]],
+  4: [[147, 147]],
+  5: [[150, 169]],
+  6: [[170, 171]],
+  7: [[172, 178]],
+  8: [[181, 181]],
 };
 
 /* ---------- small visualization helper components ---------- */
@@ -546,10 +514,10 @@ export default function FullForwardPass() {
 
   const rightContent = (
     <CodePanel
-      code={CODE}
-      title="microgpt.py — Full Forward Pass"
+      pyHighlight={PY_STEP_HIGHLIGHTS[step] ?? []}
+      jsHighlight={JS_STEP_HIGHLIGHTS[step] ?? []}
+      title="Full Forward Pass"
       blogExcerpt="Main GPT function processes: Token and position embeddings, Multi-head attention, MLP block, Residual connections"
-      highlightLines={STEP_HIGHLIGHT_LINES[step] ?? []}
     />
   );
 

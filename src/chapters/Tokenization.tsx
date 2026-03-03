@@ -36,26 +36,6 @@ function tokenColor(id: number): { bg: string; border: string; text: string } {
   return { bg: 'bg-rose-500/20', border: 'border-rose-400/60', text: 'text-rose-300' };
 }
 
-const codeString = `# Let there be a Dataset
-docs = [line.strip() for line in open('input.txt') if line.strip()]
-random.shuffle(docs)
-print(f"num docs: {len(docs)}")
-
-# Let there be a Tokenizer to translate strings to
-# sequences of integers ("tokens") and back
-uchars = sorted(set(''.join(docs)))
-BOS = len(uchars)  # Beginning of Sequence token
-vocab_size = len(uchars) + 1  # +1 for BOS
-print(f"vocab size: {vocab_size}")
-
-# Example: tokenizing "emma"
-# "emma" → [BOS, e, m, m, a, BOS]
-#        → [26,  4, 12, 12, 0, 26]
-
-# The dataset is 32,000 names like:
-# emma, olivia, ava, isabella, sophia, ...
-# Each name is a "document" to learn from`;
-
 export default function Tokenization() {
   const [text, setText] = useState('emma');
 
@@ -275,8 +255,9 @@ export default function Tokenization() {
 
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py — Tokenizer"
+      pyHighlight={[[23, 27]]}
+      jsHighlight={[[44, 48]]}
+      title="Tokenizer"
       blogExcerpt="Since neural networks require numbers, not characters, a tokenizer converts text to integer token IDs. The simplest approach assigns one integer per unique character."
     />
   );

@@ -43,15 +43,6 @@ const QUIZ_ITEMS: { name: string; isReal: boolean }[] = [
   { name: 'nelora', isReal: false },
 ];
 
-const codeString = `# Let there be a Dataset \`docs\`: list[str] of documents (e.g. a list of names)
-if not os.path.exists('input.txt'):
-    import urllib.request
-    names_url = 'https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt'
-    urllib.request.urlretrieve(names_url, 'input.txt')
-docs = [line.strip() for line in open('input.txt') if line.strip()]
-random.shuffle(docs)
-print(f"num docs: {len(docs)}")`;
-
 export default function Dataset() {
   // Document Explorer state
   const [activePattern, setActivePattern] = useState<number | null>(null);
@@ -403,8 +394,9 @@ export default function Dataset() {
 
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py -- Dataset"
+      pyHighlight={[[14, 21]]}
+      jsHighlight={[[35, 42]]}
+      title="Dataset"
       blogExcerpt="The fuel of large language models is a stream of text data, optionally separated into a set of documents. The goal of the model is to learn the patterns in the data and then generate similar new documents that share the statistical patterns within."
     />
   );

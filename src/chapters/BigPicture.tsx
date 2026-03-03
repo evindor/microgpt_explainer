@@ -82,57 +82,6 @@ const chapters = [
   },
 ];
 
-const codeString = `# microgpt.py - A GPT in 200 lines of pure Python
-# by Andrej Karpathy
-
-# 1. Dataset: load & prepare training data
-# 2. Tokenizer: text <-> numbers
-# 3. Autograd: automatic differentiation engine
-# 4. Parameters: initialize model weights
-# 5. Architecture: the GPT model (embeddings + attention + MLP)
-# 6. Training: forward -> loss -> backward -> update
-# 7. Inference: generate new text
-
-import os, math, random
-
-# --- Dataset ---
-docs = [line.strip() for line in open('input.txt')]
-
-# --- Tokenizer ---
-uchars = sorted(set(''.join(docs)))
-BOS = len(uchars)
-vocab_size = len(uchars) + 1
-
-# --- Autograd Engine ---
-class Value:
-    def __init__(self, data, children=(), local_grads=()):
-        self.data = data
-        self.grad = 0
-        self._children = children
-        self._local_grads = local_grads
-    # ... operations: +, *, **, log, exp, relu ...
-    def backward(self): ...
-
-# --- Model Parameters ---
-n_layer, n_embd, block_size, n_head = 1, 16, 16, 4
-state_dict = { 'wte': ..., 'wpe': ..., 'lm_head': ..., ... }
-
-# --- Architecture ---
-def linear(x, w): ...    # matrix-vector multiply
-def softmax(logits): ...  # convert to probabilities
-def rmsnorm(x): ...       # normalize vectors
-def gpt(token_id, pos_id, keys, values): ...  # THE model
-
-# --- Training Loop ---
-for step in range(1000):
-    # forward pass -> loss -> backward -> Adam update
-    ...
-
-# --- Inference ---
-for sample in range(20):
-    # generate token by token
-    ...`;
-
 export default function BigPicture() {
   const leftContent = (
     <div className="space-y-6">
@@ -423,8 +372,9 @@ export default function BigPicture() {
 
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py — Overview"
+      pyHighlight={[[1, 7]]}
+      jsHighlight={[[1, 7]]}
+      title="The Complete Algorithm"
       blogExcerpt="This file contains the full algorithmic content of what is needed: dataset of documents, tokenizer, autograd engine, a GPT-2-like neural network architecture, the Adam optimizer, training loop, and inference loop. Everything else is just efficiency. I cannot simplify this any further."
     />
   );

@@ -580,51 +580,11 @@ print(a.grad)   # 4.0`}
   /* ---------------------------------------------------------------- */
   /*  Right panel: CodePanel                                           */
   /* ---------------------------------------------------------------- */
-  const code = `class Value:
-    def __init__(self, data, children=(), local_grads=()):
-        self.data = data           # the actual number
-        self.grad = 0              # gradient (filled in backward)
-        self._children = children  # inputs to this operation
-        self._local_grads = local_grads  # local derivatives
-
-    def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        # d(a+b)/da = 1, d(a+b)/db = 1
-        return Value(self.data + other.data,
-                     (self, other), (1, 1))
-
-    def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        # d(a*b)/da = b, d(a*b)/db = a
-        return Value(self.data * other.data,
-                     (self, other), (other.data, self.data))
-
-    def __pow__(self, n):
-        # d(a^n)/da = n * a^(n-1)
-        return Value(self.data**n, (self,),
-                     (n * self.data**(n-1),))
-
-    def backward(self):
-        # Build topological order
-        topo = []
-        visited = set()
-        def build_topo(v):
-            if v not in visited:
-                visited.add(v)
-                for child in v._children:
-                    build_topo(child)
-                topo.append(v)
-        build_topo(self)
-        # Backpropagate
-        self.grad = 1  # seed
-        for v in reversed(topo):
-            for child, lg in zip(v._children, v._local_grads):
-                child.grad += lg * v.grad  # chain rule!`;
-
   const rightContent = (
     <CodePanel
-      code={code}
-      title="microgpt.py — Autograd Engine"
+      pyHighlight={[[29, 72]]}
+      jsHighlight={[[50, 97]]}
+      title="Autograd Engine"
       blogExcerpt="The backward() method traverses the computation graph in reverse topological order, applying the chain rule to compute gradients for all parameters."
     />
   );

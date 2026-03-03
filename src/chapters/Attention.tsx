@@ -425,54 +425,6 @@ function MultiHeadDiagram() {
 /*  Code for the Right Panel                                          */
 /* ------------------------------------------------------------------ */
 
-const attentionCode = `# Multi-head Attention — the heart of the Transformer
-n_head = 4
-head_dim = n_embd // n_head  # 16 // 4 = 4
-
-# Inside the GPT function, for each layer:
-
-# 1. Project input to Q, K, V
-q = linear(x, state_dict[f'layer{li}.attn_wq'])
-k = linear(x, state_dict[f'layer{li}.attn_wk'])
-v = linear(x, state_dict[f'layer{li}.attn_wv'])
-
-# Save K, V for future tokens to attend to
-keys[li].append(k)
-values[li].append(v)
-
-# 2. For each attention head:
-x_attn = []
-for h in range(n_head):
-    hs = h * head_dim  # head start index
-
-    # Slice this head's portion
-    q_h = q[hs:hs+head_dim]
-    k_h = [ki[hs:hs+head_dim] for ki in keys[li]]
-    v_h = [vi[hs:hs+head_dim] for vi in values[li]]
-
-    # Compute attention scores: Q · K / √d
-    attn_logits = [
-        sum(q_h[j] * k_h[t][j] for j in range(head_dim))
-        / head_dim**0.5
-        for t in range(len(k_h))
-    ]
-
-    # Softmax → attention weights (sum to 1)
-    attn_weights = softmax(attn_logits)
-
-    # Weighted sum of values
-    head_out = [
-        sum(attn_weights[t] * v_h[t][j]
-            for t in range(len(v_h)))
-        for j in range(head_dim)
-    ]
-    x_attn.extend(head_out)
-
-# Output projection
-x = linear(x_attn, state_dict[f'layer{li}.attn_wo'])
-# Residual connection
-x = [a + b for a, b in zip(x, x_residual)]`;
-
 /* ------------------------------------------------------------------ */
 /*  Main Attention Chapter                                            */
 /* ------------------------------------------------------------------ */
@@ -839,8 +791,9 @@ export default function Attention() {
 
   const rightContent = (
     <CodePanel
-      code={attentionCode}
-      title="microgpt.py — Attention"
+      pyHighlight={[[114, 134]]}
+      jsHighlight={[[149, 171]]}
+      title="Multi-Head Attention"
       blogExcerpt="Attention is the exact and only place where a token at position t gets to 'look' at tokens in the past"
     />
   );

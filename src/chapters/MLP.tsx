@@ -2,42 +2,6 @@ import { useState } from 'react';
 import Layout from '../components/Layout';
 import CodePanel from '../components/CodePanel';
 
-const code = `def rmsnorm(x):
-    # Root Mean Square Normalization
-    # Keeps vector magnitudes stable
-    ms = sum(xi * xi for xi in x) / len(x)  # mean square
-    scale = (ms + 1e-5) ** -0.5              # 1/RMS
-    return [xi * scale for xi in x]
-
-# Inside GPT, for each layer:
-
-# --- Attention block with residual ---
-x_residual = x             # save input
-x = rmsnorm(x)             # normalize
-# ... attention computation ...
-x = [a + b for a, b in zip(x, x_residual)]  # residual add
-
-# --- MLP block with residual ---
-x_residual = x             # save input
-x = rmsnorm(x)             # normalize
-
-# Expand: 16 → 64 dimensions
-x = linear(x, state_dict[f'layer{li}.mlp_fc1'])
-# Non-linearity (the "thinking" step)
-x = [xi.relu() for xi in x]
-# Shrink: 64 → 16 dimensions
-x = linear(x, state_dict[f'layer{li}.mlp_fc2'])
-
-x = [a + b for a, b in zip(x, x_residual)]  # residual add
-
-# relu(x) is simply:
-def relu(self):
-    return Value(
-        max(0, self.data),
-        (self,),
-        (float(self.data > 0),)  # gradient: 1 if positive, 0 if negative
-    )`;
-
 /* ------------------------------------------------------------------ */
 /*  ReLU Visualization                                                 */
 /* ------------------------------------------------------------------ */
@@ -512,8 +476,9 @@ export default function MLP() {
 
   const rightContent = (
     <CodePanel
-      code={code}
-      title="microgpt.py — MLP & Normalization"
+      pyHighlight={[[97, 106], [135, 141]]}
+      jsHighlight={[[130, 141], [172, 178]]}
+      title="MLP & Norms"
       blogExcerpt="The MLP block is a feed-forward computation. RMSNorm rescales vectors for stable training. Residual connections enable gradient flow and trainability."
     />
   );

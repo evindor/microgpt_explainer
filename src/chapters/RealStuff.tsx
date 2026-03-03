@@ -139,33 +139,6 @@ const PIPELINE_STEPS: { title: string; subtitle: string; description: string; co
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Code panel content                                                 */
-/* ------------------------------------------------------------------ */
-const codeString = `"""
-The most atomic way to train and run inference
-for a GPT in pure, dependency-free Python.
-This file is the complete algorithm.
-Everything else is just efficiency.
-
-@karpathy
-"""
-
-# That's it. That's the whole algorithm.
-#
-# The 200 lines of microgpt contain:
-#   - A tokenizer (text -> numbers)
-#   - Embeddings (numbers -> vectors)
-#   - Self-attention (vectors attend to each other)
-#   - An MLP (nonlinear transformation)
-#   - A loss function (cross-entropy)
-#   - Backpropagation (compute gradients)
-#   - An optimizer (update parameters)
-#   - Sampling (generate new tokens)
-#
-# Every large language model uses these same pieces.
-# The rest is engineering.`;
-
 /* ================================================================== */
 /*  Component                                                          */
 /* ================================================================== */
@@ -428,8 +401,9 @@ export default function RealStuff() {
   /* ================================================================ */
   const rightContent = (
     <CodePanel
-      code={codeString}
-      title="microgpt.py -- The Complete Algorithm"
+      pyHighlight={[[1, 7]]}
+      jsHighlight={[[1, 7]]}
+      title="The Complete Algorithm"
       blogExcerpt="All of these are important engineering and research contributions but if you understand microgpt, you understand the algorithmic essence."
     />
   );
